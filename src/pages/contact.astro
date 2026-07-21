@@ -1,0 +1,119 @@
+---
+import Layout from '../layouts/Layout.astro';
+import type { Resume } from '../types/resume';
+import resumeData from '../resume.json';
+
+const resume = resumeData as Resume;
+const basics = resume.basics || {};
+const profiles = basics.profiles || [];
+---
+
+<Layout title="Contact - dppereyra" description="Get in touch with me">
+  <div class="max-w-3xl mx-auto">
+    <h1 class="text-4xl font-bold mb-8">Contact Me</h1>
+
+    <div class="grid md:grid-cols-2 gap-8">
+      <div class="card bg-base-200 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title text-2xl mb-4">Get in Touch</h2>
+
+          <form class="space-y-4" method="POST" name="contact" data-netlify="true" netlify-honeypot="bot-field">
+            <input type="hidden" name="form-name" value="contact" />
+            <p class="hidden">
+              <label>
+                Don&apos;t fill this out if you&apos;re human: <input name="bot-field" />
+              </label>
+            </p>
+            <div class="form-control">
+              <label class="label" for="name">
+                <span class="label-text">Name</span>
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Your name"
+                class="input input-bordered w-full"
+                required
+              />
+            </div>
+
+            <div class="form-control">
+              <label class="label" for="email">
+                <span class="label-text">Email</span>
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="your.email@example.com"
+                class="input input-bordered w-full"
+                required
+              />
+            </div>
+
+            <div class="form-control">
+              <label class="label" for="message">
+                <span class="label-text">Message</span>
+              </label>
+              <textarea
+                id="message"
+                name="message"
+                placeholder="Your message"
+                class="textarea textarea-bordered h-32"
+                required
+              ></textarea>
+            </div>
+
+              <button type="submit" class="btn btn-primary w-full">
+                Send Message
+              </button>
+              <p class="text-sm text-base-content/70">
+                Messages submitted here are captured by Netlify form handling.
+              </p>
+           </form>
+        </div>
+      </div>
+
+      <div class="card bg-base-200 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title text-2xl mb-4">Other Ways to Connect</h2>
+
+          <div class="space-y-4">
+            <div>
+              <h3 class="font-semibold mb-2">Social Media</h3>
+              <ul class="space-y-2">
+                {profiles.map((profile) => (
+                  <li>
+                    <a href={profile.url} target="_blank" rel="noopener noreferrer" class="link link-primary">
+                      {profile.network}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {basics.email && (
+            <div>
+              <h3 class="font-semibold mb-2">Email</h3>
+              <p class="text-base-content/70">
+                For direct inquiries, you can also reach me at:
+              </p>
+              <a href={`mailto:${basics.email}`} class="link link-primary">
+                {basics.email}
+              </a>
+            </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-info mt-8">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      <span>Messages can be submitted directly here, or you can use the email and social links.</span>
+    </div>
+  </div>
+</Layout>

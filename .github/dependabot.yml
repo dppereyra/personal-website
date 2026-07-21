@@ -1,0 +1,29 @@
+version: 2
+updates:
+  # Monitor npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    # Disable automatic PR creation - only show alerts
+    open-pull-requests-limit: 0
+    # Group all updates together if PRs were enabled
+    groups:
+      dependencies:
+        patterns:
+          - "*"
+    # Enable security updates only
+    # Note: With open-pull-requests-limit: 0, no PRs will be created
+    # but security alerts will still be visible in the Security tab
+
+  # Monitor GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    # Disable automatic PR creation
+    open-pull-requests-limit: 0
