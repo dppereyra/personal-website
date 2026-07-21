@@ -190,7 +190,7 @@ npm run generate:resume
 ## CI/CD
 
 **GitHub Actions** (`.github/workflows/ci.yml`):
-- Runs on all pushes to `main`/`master` and on all pull requests
+- Runs on all pushes to `production`/`staging`/`master` and on all pull requests
 - **Jobs:**
  - `lint-and-typecheck`: Runs `astro check` for type checking
  - `test`: Runs Vitest tests and generates coverage reports
@@ -211,7 +211,7 @@ All PRs must pass:
 - Check alerts manually and update as needed
 
 **SonarQube Integration**:
-- Runs code quality analysis on main branch and PRs
+- Runs code quality analysis on the configured CI branches and PRs
 - Requires two GitHub secrets:
   - `SONAR_TOKEN`: SonarQube authentication token
   - `SONAR_HOST_URL`: SonarQube server URL (e.g., https://sonarcloud.io)
@@ -235,3 +235,8 @@ All PRs must pass:
 ## Deployment
 
 Configured for Netlify deployment via netlify-cli. The site is configured for www.dppereyra.com domain.
+
+**Branch Roles**:
+- `production` - production branch/site
+- `staging` - staging branch/site
+- `master` - development/local branch
