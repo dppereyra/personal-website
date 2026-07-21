@@ -6,10 +6,13 @@ import tailwindcss from '@tailwindcss/vite';
 
 import sentry from '@sentry/astro';
 
+const branch = process.env.BRANCH ?? process.env.HEAD;
 const site = process.env.SITE_URL
-  ?? (process.env.BRANCH === 'staging'
+  ?? (branch === 'staging'
     ? 'https://dpp-site-staging.netlify.app'
-    : 'https://www.dppereyra.com');
+    : branch === 'main' || branch === 'master'
+      ? 'https://www.dppereyra.com'
+      : 'http://localhost:4321');
 
 // https://astro.build/config
 export default defineConfig({
