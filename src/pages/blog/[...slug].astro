@@ -1,18 +1,18 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import { formatDate } from '../../utils/formatDate';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
-  return posts.map((post) => ({
-    params: { slug: post.slug },
+  return posts.map((post: CollectionEntry<'blog'>) => ({
+    params: { slug: post.id },
     props: post,
   }));
 }
 
-const post = Astro.props;
-const { Content } = await post.render();
+const post: CollectionEntry<'blog'> = Astro.props;
+const { Content } = await render(post);
 ---
 
 <Layout title={post.data.title} description={post.data.description}>
@@ -26,7 +26,7 @@ const { Content } = await post.render();
         </time>
         {post.data.tags.length > 0 && (
           <div class="flex gap-2">
-            {post.data.tags.map((tag) => (
+            {post.data.tags.map((tag: string) => (
               <span class="badge badge-sm">{tag}</span>
             ))}
           </div>

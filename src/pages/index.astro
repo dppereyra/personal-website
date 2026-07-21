@@ -1,10 +1,10 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import { formatDate, sortByDate } from '../utils/formatDate';
 
 const allPosts = await getCollection('blog');
-const sortedPosts = sortByDate(allPosts);
+const sortedPosts: CollectionEntry<'blog'>[] = sortByDate(allPosts);
 ---
 
 <Layout title="Blog - dppereyra">
@@ -16,7 +16,7 @@ const sortedPosts = sortByDate(allPosts);
         <article class="card bg-base-200 shadow-xl">
           <div class="card-body">
             <h2 class="card-title text-2xl">
-              <a href={`/blog/${post.slug}`} class="hover:text-primary">
+              <a href={`/blog/${post.id}`} class="hover:text-primary">
                 {post.data.title}
               </a>
             </h2>
@@ -29,7 +29,7 @@ const sortedPosts = sortByDate(allPosts);
               </time>
               {post.data.tags.length > 0 && (
                 <div class="flex gap-2">
-                  {post.data.tags.map((tag) => (
+                  {post.data.tags.map((tag: string) => (
                     <span class="badge badge-sm">{tag}</span>
                   ))}
                 </div>
