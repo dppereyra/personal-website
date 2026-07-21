@@ -1,0 +1,43 @@
+{
+  "name": "personal-website",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "npm run full-build",
+    "build:site": "astro check && astro build",
+    "full-build": "npm test && npm run generate:resume && npm run build:site",
+    "preview": "astro preview",
+    "astro": "astro",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "generate:resume": "node scripts/generate-resume-pdf.js"
+  },
+  "dependencies": {
+    "@astrojs/svelte": "^7.2.5",
+    "@tailwindcss/vite": "^4.1.18",
+    "astro": "^5.17.1",
+    "svelte": "^5.49.1",
+    "tailwindcss": "^4.1.18"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.6",
+    "@sentry/astro": "^10.38.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/svelte": "^5.3.1",
+    "@vitest/coverage-v8": "^4.0.18",
+    "@vitest/ui": "^4.0.18",
+    "daisyui": "^5.5.16",
+    "happy-dom": "^20.4.0",
+    "jsdom": "^28.0.0",
+    "jsonresume-theme-even": "^0.26.1",
+    "jsonresume-theme-stackoverflow": "^2.1.0",
+    "puppeteer": "^24.36.1",
+    "resumed": "^6.1.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  }
+}
