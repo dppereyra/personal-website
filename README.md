@@ -11,7 +11,7 @@ Personal website and blog built with Astro, Svelte, Tailwind CSS, and DaisyUI.
 - 📝 Blog with Markdown support via Astro Content Collections
 - 🎨 Styled with Tailwind CSS and DaisyUI components
 - ⚡ Fast static site generation with Astro
-- 🧪 Comprehensive testing with Vitest
+- 🧪 Comprehensive testing with Vitest and Robot Framework
 - 🔄 CI/CD with GitHub Actions
 - 📊 Code quality monitoring with SonarQube
 - 🔒 Automated security alerts with Dependabot
@@ -34,13 +34,14 @@ npm run full-build
 
 ## Development
 
-See [CLAUDE.md](./CLAUDE.md) for detailed development guide, architecture, and conventions.
+See [AGENTS.md](./AGENTS.md) for detailed development guide, architecture, and conventions.
 
 ## CI/CD
 
 All pull requests automatically run:
 - Type checking with Astro
 - Unit tests with Vitest
+- Browser E2E checks with Robot Framework in Chrome and Firefox
 - Full production build verification, including resume PDF generation
 - Code quality analysis with SonarQube
 

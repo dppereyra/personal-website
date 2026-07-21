@@ -12,11 +12,16 @@
     "build:site": "astro check && astro build",
     "full-build": "npm test && npm run generate:resume && npm run build:site",
     "preview": "astro preview",
+    "preview:e2e": "astro preview --host 127.0.0.1 --port 4321",
     "astro": "astro",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
+    "test:robot": "robot --outputdir robot-results tests/robot",
+    "test:robot:chrome": "BROWSER=chrome npm run test:robot",
+    "test:robot:firefox": "BROWSER=firefox npm run test:robot",
+    "test:robot:all": "npm run test:robot:chrome && npm run test:robot:firefox",
     "generate:resume": "node scripts/generate-resume-pdf.js"
   },
   "dependencies": {
@@ -41,7 +46,8 @@
     "puppeteer": "24.37.4",
     "resumed": "6.1.0",
     "typescript": "5.9.3",
-    "vitest": "4.1.10"
+    "vitest": "4.1.10",
+    "wait-on": "^8.0.5"
   },
   "overrides": {
     "vite": "8.1.5",
