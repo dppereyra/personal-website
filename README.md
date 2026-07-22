@@ -28,8 +28,35 @@ npm run dev
 # Run tests
 npm test
 
+# Install Robot Framework dependencies for browser E2E checks
+npm run test:robot:install
+
 # Build for production
 npm run full-build
+```
+
+## Robot E2E
+
+Install the Python dependencies once before running the browser checks locally:
+
+```bash
+npm run test:robot:install
+```
+
+This creates a local virtual environment in `.venv-robot` so Robot dependencies do not need to be installed into the system Python.
+
+Then build and preview the site in one terminal:
+
+```bash
+npm run build:site
+npm run preview:e2e
+```
+
+Run the Robot suite in another terminal:
+
+```bash
+PATH="$(pwd)/.venv-robot/bin:$PATH" npm run test:robot:chrome
+PATH="$(pwd)/.venv-robot/bin:$PATH" npm run test:robot:firefox
 ```
 
 ## Development
