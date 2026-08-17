@@ -11,7 +11,7 @@ ${HEADLESS_ARG}         --headless=new
 *** Keywords ***
 Open Browser To Page
   [Arguments]    ${path}=/
-  ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions() if browser == 'chrome' else sys.modules['selenium.webdriver'].FirefoxOptions()    sys, selenium.webdriver    browser=${BROWSER}
+  ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions() if $BROWSER == 'chrome' else sys.modules['selenium.webdriver'].FirefoxOptions()    modules=sys, selenium.webdriver
   IF    '${BROWSER}' == 'chrome'
     Call Method    ${options}    add_argument    ${HEADLESS_ARG}
     Call Method    ${options}    add_argument    --no-sandbox
