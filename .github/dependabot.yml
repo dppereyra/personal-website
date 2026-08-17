@@ -8,11 +8,20 @@ updates:
       day: "monday"
       time: "09:00"
     open-pull-requests-limit: 10
-    # Group all updates into a single weekly PR to keep noise low
+    # Bundle only patch/minor bumps, which are low-risk. Major bumps are left
+    # ungrouped so each opens its own PR instead of blocking the whole batch
+    # when one major turns out to be breaking (e.g. a peer-dependency conflict).
     groups:
-      dependencies:
-        patterns:
-          - "*"
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      # @astrojs/check currently only supports typescript ^5.0.0 || ^6.0.0;
+      # typescript 7.x breaks `npm ci` with an ERESOLVE conflict. Revisit once
+      # @astrojs/check adds typescript 7 support.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
 
   # Monitor GitHub Actions
   - package-ecosystem: "github-actions"
@@ -22,3 +31,8 @@ updates:
       day: "monday"
       time: "09:00"
     open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
