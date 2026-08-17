@@ -237,6 +237,12 @@ All PRs must pass:
 Configured for Netlify deployment via netlify-cli. The site is configured for www.dppereyra.com domain.
 
 **Branch Roles**:
-- `production` - production branch/site
-- `staging` - staging branch/site
-- `master` - development/local branch
+- `master` - development/local branch, not deployed anywhere critical
+- `staging` - staging branch/site, protected
+- `production` - production branch/site, protected
+
+**Promotion flow**: changes land on `master` first, then flow forward one branch at a time via pull request — never push or merge directly into `staging` or `production`:
+1. PR from `master` → `staging`
+2. Once verified on staging, PR from `staging` → `production`
+
+`staging` and `production` are configured as protected branches, so direct pushes are rejected and this PR-based promotion is the only way changes reach them.
