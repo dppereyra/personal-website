@@ -48,7 +48,7 @@
     "resumed": "6.1.0",
     "typescript": "5.9.3",
     "vitest": "4.1.10",
-    "wait-on": "^8.0.5"
+    "wait-on": "^9.1.0"
   },
   "overrides": {
     "vite": "8.1.5",
