@@ -1,0 +1,52 @@
+---
+import type { Resume } from '../types/resume';
+import resumeData from '../resume.json';
+import SocialIcon from './SocialIcon.astro';
+
+const resume = resumeData as Resume;
+const basics = resume.basics || {};
+const profiles = basics.profiles || [];
+---
+
+<aside class="profile-sidebar">
+  <div class="flex flex-col items-center text-center gap-3">
+    {basics.image && (
+      <img
+        src={basics.image}
+        alt={basics.name}
+        class="w-24 h-24 rounded-full object-cover ring-4 ring-primary/20"
+      />
+    )}
+    {basics.name && <h2 class="text-lg font-bold">{basics.name}</h2>}
+    {basics.label && <p class="text-sm text-base-content/70">{basics.label}</p>}
+
+    {(profiles.length > 0 || basics.email) && (
+      <div class="flex flex-wrap justify-center gap-2 mt-1">
+        {profiles.map((profile) => (
+          <a
+            href={profile.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="social-icon-btn"
+            title={profile.network}
+            aria-label={profile.network}
+          >
+            <SocialIcon network={profile.network} class="h-4 w-4" />
+          </a>
+        ))}
+        {basics.email && (
+          <a
+            href={`mailto:${basics.email}`}
+            class="social-icon-btn"
+            title="Email"
+            aria-label="Email"
+          >
+            <SocialIcon network="email" class="h-4 w-4" />
+          </a>
+        )}
+      </div>
+    )}
+
+    <a href="/contact" class="btn btn-primary btn-sm rounded-full mt-2 w-full">Get in Touch</a>
+  </div>
+</aside>

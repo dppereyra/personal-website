@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import type { Resume } from '../types/resume';
 import resumeData from '../resume.json';
+import SocialIcon from '../components/SocialIcon.astro';
 
 const resume = resumeData as Resume;
 const basics = resume.basics || {};
@@ -17,7 +18,21 @@ const profiles = basics.profiles || [];
         <div class="card-body">
           <h2 class="card-title text-2xl mb-4">Get in Touch</h2>
 
-          <form class="space-y-4" method="POST" name="contact" data-netlify="true" netlify-honeypot="bot-field">
+          <div id="contact-success" class="alert alert-success mb-4" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span>Thanks for reaching out! Your message has been sent.</span>
+          </div>
+
+          <div id="contact-error" class="alert alert-error mb-4" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"></path>
+            </svg>
+            <span>Something went wrong sending your message. Please try again or email me directly below.</span>
+          </div>
+
+          <form id="contact-form" class="space-y-4" method="POST" action="/" name="contact" data-netlify="true" netlify-honeypot="bot-field">
             <input type="hidden" name="form-name" value="contact" />
             <p class="hidden">
               <label>
@@ -85,7 +100,8 @@ const profiles = basics.profiles || [];
               <ul class="space-y-2">
                 {profiles.map((profile) => (
                   <li>
-                    <a href={profile.url} target="_blank" rel="noopener noreferrer" class="link link-primary">
+                    <a href={profile.url} target="_blank" rel="noopener noreferrer" class="link link-primary flex items-center gap-2">
+                      <SocialIcon network={profile.network} class="h-4 w-4 shrink-0" />
                       {profile.network}
                     </a>
                   </li>
@@ -99,7 +115,8 @@ const profiles = basics.profiles || [];
               <p class="text-base-content/70">
                 For direct inquiries, you can also reach me at:
               </p>
-              <a href={`mailto:${basics.email}`} class="link link-primary">
+              <a href={`mailto:${basics.email}`} class="link link-primary flex items-center gap-2 mt-1">
+                <SocialIcon network="email" class="h-4 w-4 shrink-0" />
                 {basics.email}
               </a>
             </div>
@@ -117,3 +134,38 @@ const profiles = basics.profiles || [];
     </div>
   </div>
 </Layout>
+
+<script>
+  const form = document.getElementById('contact-form');
+  const successEl = document.getElementById('contact-success');
+  const errorEl = document.getElementById('contact-error');
+
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!(form instanceof HTMLFormElement)) return;
+
+    const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+    submitButton?.setAttribute('disabled', 'true');
+    errorEl?.setAttribute('hidden', 'true');
+
+    const data = new FormData(form);
+
+    try {
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(data as unknown as Record<string, string>).toString(),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      form.hidden = true;
+      successEl?.removeAttribute('hidden');
+    } catch (err) {
+      errorEl?.removeAttribute('hidden');
+      submitButton?.removeAttribute('disabled');
+    }
+  });
+</script>
