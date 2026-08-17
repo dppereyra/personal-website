@@ -129,6 +129,7 @@ jobs:
       - name: Build site
         env:
           PUBLIC_SENTRY_DSN: ${{ secrets.PUBLIC_SENTRY_DSN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           PUBLIC_GA_MEASUREMENT_ID: ${{ secrets.PUBLIC_GA_MEASUREMENT_ID }}
           NODE_ENV: production

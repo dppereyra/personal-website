@@ -9,6 +9,10 @@ const resume = resumeData as Resume;
 const basics = resume.basics || {};
 const skills = resume.skills || [];
 const interests = resume.interests || [];
+// Pluralsight stays in the sidebar only, not in this social media list.
+const socialProfiles = (basics.profiles || []).filter(
+  (profile) => profile.network?.toLowerCase() !== 'pluralsight'
+);
 ---
 
 <Layout title="About - Chiff's Nook" description={basics.summary || "About me"}>
@@ -76,12 +80,12 @@ const interests = resume.interests || [];
       </div>
     )}
 
-    {basics.profiles && basics.profiles.length > 0 && (
+    {socialProfiles.length > 0 && (
       <div class="card bg-base-200 shadow-xl mb-6">
         <div class="card-body">
           <h3 class="card-title mb-4">Connect</h3>
           <div class="flex flex-wrap gap-3">
-            {basics.profiles.map((profile) => (
+            {socialProfiles.map((profile) => (
               <a
                 href={profile.url}
                 target="_blank"
