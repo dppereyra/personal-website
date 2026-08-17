@@ -11,6 +11,8 @@ Personal website and blog built with Astro, Svelte, Tailwind CSS, and DaisyUI.
 - 📝 Blog with Markdown support via Astro Content Collections
 - 🎨 Styled with Tailwind CSS and DaisyUI components
 - ⚡ Fast static site generation with Astro
+- ✉️ Working contact form via Netlify Forms (AJAX submission with success/error feedback)
+- 🖼️ Profile image sourced from Gravatar
 - 🧪 Comprehensive testing with Vitest and Robot Framework
 - 🔄 CI/CD with GitHub Actions
 - 📊 Code quality monitoring with SonarQube
@@ -58,6 +60,91 @@ Run the Robot suite in another terminal:
 PATH="$(pwd)/.venv-robot/bin:$PATH" npm run test:robot:chrome
 PATH="$(pwd)/.venv-robot/bin:$PATH" npm run test:robot:firefox
 ```
+
+## Local CI with act
+
+Use [`act`](https://github.com/nektos/act) to run most GitHub Actions jobs locally.
+
+### Prerequisites
+
+```bash
+# Install Docker Desktop and make sure it is running
+
+# Install act
+brew install act
+```
+
+This repository includes a local `.actrc` that maps `ubuntu-latest` to a fuller runner image:
+
+```text
+-P ubuntu-latest=ghcr.io/catthehacker/ubuntu:full-latest
+```
+
+On Apple Silicon Macs, also pass `--container-architecture linux/amd64` when running `act`.
+
+### Optional local secrets
+
+Most local runs do not need real secrets, but the `build` and `sonarqube` jobs read GitHub Actions secrets. Create a local secrets file if you want to exercise those jobs with `act`:
+
+```bash
+cp .secrets.act.example .secrets.act
+```
+
+Then fill in any values you need. For SonarQube local runs, set:
+
+```text
+SONAR_TOKEN=your_sonar_token
+SONAR_HOST_URL=https://sonarqube.example.com
+```
+
+Notes:
+
+- Empty `PUBLIC_SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, and `PUBLIC_GA_MEASUREMENT_ID` values are fine for most local `act` runs.
+- `sonarqube` needs real `SONAR_TOKEN` and `SONAR_HOST_URL` values.
+
+### Recommended jobs
+
+These jobs should be the most useful and reliable to run locally:
+
+```bash
+act -j lint-and-typecheck
+act -j test
+act -j build --secret-file .secrets.act
+```
+
+On Apple Silicon:
+
+```bash
+act --container-architecture linux/amd64 -j lint-and-typecheck
+act --container-architecture linux/amd64 -j test
+act --container-architecture linux/amd64 -j build --secret-file .secrets.act
+```
+
+### Robot E2E job
+
+You can try the browser-based CI job with:
+
+```bash
+act -j e2e-robot
+```
+
+On Apple Silicon:
+
+```bash
+act --container-architecture linux/amd64 -j e2e-robot
+```
+
+This job is more likely to fail locally because it depends on container browser setup for Chrome and Firefox. If that happens, use the native local Robot flow in the section above instead.
+
+### Full workflow
+
+You can attempt the full workflow with:
+
+```bash
+act
+```
+
+For this repository, `act` is usually most effective when run job-by-job, especially if you want fast feedback or want to avoid optional SonarQube and browser setup issues.
 
 ## Development
 
