@@ -5,17 +5,14 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
+      day: "sunday"
       time: "09:00"
     open-pull-requests-limit: 10
-    # Bundle only patch/minor bumps, which are low-risk. Major bumps are left
-    # ungrouped so each opens its own PR instead of blocking the whole batch
-    # when one major turns out to be breaking (e.g. a peer-dependency conflict).
+    # Batch everything (including majors) into a single weekly PR.
     groups:
-      minor-and-patch:
-        update-types:
-          - "minor"
-          - "patch"
+      dependencies:
+        patterns:
+          - "*"
     ignore:
       # @astrojs/check currently only supports typescript ^5.0.0 || ^6.0.0;
       # typescript 7.x breaks `npm ci` with an ERESOLVE conflict. Revisit once
@@ -28,11 +25,10 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
+      day: "sunday"
       time: "09:00"
     open-pull-requests-limit: 5
     groups:
-      minor-and-patch:
-        update-types:
-          - "minor"
-          - "patch"
+      dependencies:
+        patterns:
+          - "*"
