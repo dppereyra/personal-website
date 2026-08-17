@@ -5,20 +5,30 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
+      day: "sunday"
       time: "09:00"
     open-pull-requests-limit: 10
-    # Group all updates into a single weekly PR to keep noise low
+    # Batch everything (including majors) into a single weekly PR.
     groups:
       dependencies:
         patterns:
           - "*"
+    ignore:
+      # @astrojs/check currently only supports typescript ^5.0.0 || ^6.0.0;
+      # typescript 7.x breaks `npm ci` with an ERESOLVE conflict. Revisit once
+      # @astrojs/check adds typescript 7 support.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
 
   # Monitor GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
+      day: "sunday"
       time: "09:00"
     open-pull-requests-limit: 5
+    groups:
+      dependencies:
+        patterns:
+          - "*"
