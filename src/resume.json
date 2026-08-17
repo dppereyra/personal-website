@@ -5,7 +5,6 @@
   "basics": {
     "name": "Dennis Philippe T. Pereyra Jr.",
     "label": "SRE / DevOps / Platform Engineer",
-    "image": "https://www.gravatar.com/avatar/2f211fa7ef31d199971223a4c62667cf?s=200&d=identicon",
     "email": "mail@dppereyra.com",
     "phone": "+63(917)874-8013 / +63(908)822-0122",
     "summary": "I have developed applications that act on a realtime manner involving continuously incoming data streams. I also have experience designing and setting up a fault tolerant, distributed, and secure infrastructure. I have done development workflows redesign ie integrating CI/CD and containerization as well. I can work on data analytics particularly with natural language processing and audio data processing. I can also setup database warehouse systems to store large data and make it so that data retrieval speeds are relatively fast provided I have access to the application code as well.",

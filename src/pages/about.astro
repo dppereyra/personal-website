@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import type { Resume } from '../types/resume';
 import resumeData from '../resume.json';
 import SocialIcon from '../components/SocialIcon.astro';
+import { PROFILE_IMAGE_URL } from '../consts';
 
 const resume = resumeData as Resume;
 const basics = resume.basics || {};
@@ -17,23 +18,19 @@ const interests = resume.interests || [];
     <div class="card bg-base-200 shadow-xl mb-6">
       <div class="card-body">
         <div class="flex flex-col md:flex-row gap-8 items-center md:items-start">
-          {basics.image && (
-            <div class="flex-shrink-0 relative">
-              <div class="relative">
-                <div class="absolute inset-0 rounded-full border-4 border-primary"></div>
-                <img
-                  src={basics.image}
-                  alt={basics.name}
-                  class="w-40 h-40 rounded-full object-cover relative"
-                />
-              </div>
+          <div class="flex-shrink-0 relative">
+            <div class="relative">
+              <div class="absolute inset-0 rounded-full border-4 border-primary"></div>
+              <img
+                src={PROFILE_IMAGE_URL}
+                alt={basics.name}
+                class="w-40 h-40 rounded-full object-cover relative"
+              />
             </div>
-          )}
+          </div>
 
           <div class="flex-1 relative">
-            {basics.image && (
-              <div class="hidden md:block absolute left-0 top-0 w-12 h-0.5 bg-primary -ml-12 mt-20"></div>
-            )}
+            <div class="hidden md:block absolute left-0 top-0 w-12 h-0.5 bg-primary -ml-12 mt-20"></div>
 
             {basics.name && (
               <h2 class="card-title text-3xl mb-2 font-bold">{basics.name}</h2>
