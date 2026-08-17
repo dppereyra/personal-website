@@ -66,9 +66,13 @@ Assert Current Page Is Not 404
     Should Not Contain    ${source_lower}    ${marker}
   END
 
+Assert PDF Destination Is Not 404
+  ${title}=    Get Title
+  Should Not Be Equal As Strings    ${title}    404
+
 Assert Internal Destination Loads
   [Arguments]    ${path}
   Go To    ${BASE_URL}${path}
   Location Should Contain    ${BASE_URL}
-  Run Keyword If    '${path}'.endswith('.pdf')    Title Should Not Be    404
+  Run Keyword If    '${path}'.endswith('.pdf')    Assert PDF Destination Is Not 404
   ...    ELSE    Assert Current Page Is Not 404
