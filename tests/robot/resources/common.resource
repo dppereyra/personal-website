@@ -36,11 +36,11 @@ Normalize Internal Url
   IF    '${trimmed}'.startswith('#') or '${trimmed}'.startswith('mailto:') or '${trimmed}'.startswith('tel:') or '${trimmed}'.startswith('javascript:')
     RETURN    ${NONE}
   END
-  ${is_internal}=    Evaluate    trimmed.startswith('/') or trimmed.startswith(base_url)    trimmed=${trimmed}    base_url=${BASE_URL}
+  ${is_internal}=    Evaluate    $trimmed.startswith('/') or $trimmed.startswith($BASE_URL)
   IF    not ${is_internal}
     RETURN    ${NONE}
   END
-  ${path_only}=    Evaluate    __import__('urllib.parse').urlsplit(trimmed).path or '/'    trimmed=${trimmed}
+  ${path_only}=    Evaluate    sys.modules['urllib.parse'].urlsplit($trimmed).path or '/'    modules=sys, urllib.parse
   RETURN    ${path_only}
 
 Collect Internal Links From Current Page
