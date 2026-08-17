@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import type { Resume } from '../types/resume';
 import resumeData from '../resume.json';
+import SocialIcon from '../components/SocialIcon.astro';
 
 const resume = resumeData as Resume;
 const basics = resume.basics || {};
@@ -99,7 +100,8 @@ const profiles = basics.profiles || [];
               <ul class="space-y-2">
                 {profiles.map((profile) => (
                   <li>
-                    <a href={profile.url} target="_blank" rel="noopener noreferrer" class="link link-primary">
+                    <a href={profile.url} target="_blank" rel="noopener noreferrer" class="link link-primary flex items-center gap-2">
+                      <SocialIcon network={profile.network} class="h-4 w-4 shrink-0" />
                       {profile.network}
                     </a>
                   </li>
@@ -113,7 +115,8 @@ const profiles = basics.profiles || [];
               <p class="text-base-content/70">
                 For direct inquiries, you can also reach me at:
               </p>
-              <a href={`mailto:${basics.email}`} class="link link-primary">
+              <a href={`mailto:${basics.email}`} class="link link-primary flex items-center gap-2 mt-1">
+                <SocialIcon network="email" class="h-4 w-4 shrink-0" />
                 {basics.email}
               </a>
             </div>
