@@ -45,3 +45,6 @@ public/resume.pdf
 
 # Local Netlify folder
 .netlify
+
+# Local tooling
+.opencode/
