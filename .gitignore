@@ -37,11 +37,11 @@ robot-results/
 *.tmp
 *.temp
 
-# SonarQube
-.scannerwork/
-
 # Generated files
 public/resume.pdf
 
 # Local Netlify folder
 .netlify
+
+# Local tooling
+.opencode/

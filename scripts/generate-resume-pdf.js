@@ -39,7 +39,7 @@ try {
   console.log('🔨 Running resumed export...');
 
   execSync(
-    `npx resumed export "${resumeJsonPath}" --format pdf --theme jsonresume-theme-stackoverflow`,
+    `npx resumed export "${resumeJsonPath}" --format pdf --theme jsonresume-theme-stackoverflow --puppeteer-arg=--no-sandbox --puppeteer-arg=--disable-setuid-sandbox`,
     {
       stdio: 'inherit',
       cwd: projectRoot

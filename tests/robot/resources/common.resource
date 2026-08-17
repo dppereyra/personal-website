@@ -11,7 +11,7 @@ ${HEADLESS_ARG}         --headless=new
 *** Keywords ***
 Open Browser To Page
   [Arguments]    ${path}=/
-  ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions() if browser == 'chrome' else sys.modules['selenium.webdriver'].FirefoxOptions()    sys, selenium.webdriver    browser=${BROWSER}
+  ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions() if $BROWSER == 'chrome' else sys.modules['selenium.webdriver'].FirefoxOptions()    modules=sys, selenium.webdriver
   IF    '${BROWSER}' == 'chrome'
     Call Method    ${options}    add_argument    ${HEADLESS_ARG}
     Call Method    ${options}    add_argument    --no-sandbox
@@ -36,11 +36,11 @@ Normalize Internal Url
   IF    '${trimmed}'.startswith('#') or '${trimmed}'.startswith('mailto:') or '${trimmed}'.startswith('tel:') or '${trimmed}'.startswith('javascript:')
     RETURN    ${NONE}
   END
-  ${is_internal}=    Evaluate    trimmed.startswith('/') or trimmed.startswith(base_url)    trimmed=${trimmed}    base_url=${BASE_URL}
+  ${is_internal}=    Evaluate    $trimmed.startswith('/') or $trimmed.startswith($BASE_URL)
   IF    not ${is_internal}
     RETURN    ${NONE}
   END
-  ${path_only}=    Evaluate    __import__('urllib.parse').urlsplit(trimmed).path or '/'    trimmed=${trimmed}
+  ${path_only}=    Evaluate    sys.modules['urllib.parse'].urlsplit($trimmed).path or '/'    modules=sys, urllib.parse
   RETURN    ${path_only}
 
 Collect Internal Links From Current Page
@@ -66,9 +66,13 @@ Assert Current Page Is Not 404
     Should Not Contain    ${source_lower}    ${marker}
   END
 
+Assert PDF Destination Is Not 404
+  ${title}=    Get Title
+  Should Not Be Equal As Strings    ${title}    404
+
 Assert Internal Destination Loads
   [Arguments]    ${path}
   Go To    ${BASE_URL}${path}
   Location Should Contain    ${BASE_URL}
-  Run Keyword If    '${path}'.endswith('.pdf')    Title Should Not Be    404
+  Run Keyword If    '${path}'.endswith('.pdf')    Assert PDF Destination Is Not 404
   ...    ELSE    Assert Current Page Is Not 404

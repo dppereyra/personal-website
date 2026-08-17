@@ -18,6 +18,7 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
+    "test:robot:install": "python3 -m venv .venv-robot && ./.venv-robot/bin/python -m pip install -r requirements-robot.txt",
     "test:robot": "robot --outputdir robot-results tests/robot",
     "test:robot:chrome": "BROWSER=chrome npm run test:robot",
     "test:robot:firefox": "BROWSER=firefox npm run test:robot",
