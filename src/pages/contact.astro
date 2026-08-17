@@ -6,7 +6,10 @@ import SocialIcon from '../components/SocialIcon.astro';
 
 const resume = resumeData as Resume;
 const basics = resume.basics || {};
-const profiles = basics.profiles || [];
+// Pluralsight stays in the sidebar only, not in this social media list.
+const profiles = (basics.profiles || []).filter(
+  (profile) => profile.network?.toLowerCase() !== 'pluralsight'
+);
 ---
 
 <Layout title="Contact - Chiff's Nook" description="Get in touch with me">
@@ -97,16 +100,19 @@ const profiles = basics.profiles || [];
           <div class="space-y-4">
             <div>
               <h3 class="font-semibold mb-2">Social Media</h3>
-              <ul class="space-y-2">
+              <div class="flex flex-wrap gap-3">
                 {profiles.map((profile) => (
-                  <li>
-                    <a href={profile.url} target="_blank" rel="noopener noreferrer" class="link link-primary flex items-center gap-2">
-                      <SocialIcon network={profile.network} class="h-4 w-4 shrink-0" />
-                      {profile.network}
-                    </a>
-                  </li>
+                  <a
+                    href={profile.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="btn btn-outline btn-sm gap-2"
+                  >
+                    <SocialIcon network={profile.network} class="h-4 w-4" />
+                    {profile.network}
+                  </a>
                 ))}
-              </ul>
+              </div>
             </div>
 
             {basics.email && (

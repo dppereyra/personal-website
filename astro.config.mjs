@@ -9,7 +9,7 @@ import sentry from '@sentry/astro';
 const branch = process.env.BRANCH ?? process.env.HEAD;
 const site = process.env.SITE_URL
   ?? (branch === 'staging'
-    ? 'https://dpp-site-staging.netlify.app'
+    ? 'https://personal-website-staging.netlify.app'
     : branch === 'production'
       ? 'https://www.dppereyra.com'
       : 'http://localhost:4321');
@@ -21,10 +21,9 @@ export default defineConfig({
     svelte(),
     sentry({
       enabled: !!process.env.PUBLIC_SENTRY_DSN,
-      sourceMapsUploadOptions: {
-        project: 'personal-website',
-        authToken: process.env.SENTRY_AUTH_TOKEN,
-      },
+      org: process.env.SENTRY_ORG,
+      project: 'personal-website',
+      authToken: process.env.SENTRY_AUTH_TOKEN,
     }),
   ],
 

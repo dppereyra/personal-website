@@ -139,6 +139,15 @@ For this repository, `act` is usually most effective when run job-by-job, especi
 
 See [AGENTS.md](./AGENTS.md) for detailed development guide, architecture, and conventions.
 
+## Deployment
+
+Changes are promoted forward one branch at a time via pull request:
+
+1. **PR from `master` → `staging`**
+2. **PR from `staging` → `production`**, once verified on staging
+
+`master` is development/local only. `staging` and `production` are protected branches — direct pushes are rejected, so this PR-based flow is the only way changes reach them.
+
 ## CI/CD
 
 All pull requests automatically run:
