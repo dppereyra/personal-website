@@ -37,9 +37,6 @@ robot-results/
 *.tmp
 *.temp
 
-# SonarQube
-.scannerwork/
-
 # Generated files
 public/resume.pdf
 

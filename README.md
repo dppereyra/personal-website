@@ -15,8 +15,7 @@ Personal website and blog built with Astro, Svelte, Tailwind CSS, and DaisyUI.
 - 🖼️ Profile image sourced from Gravatar
 - 🧪 Comprehensive testing with Vitest and Robot Framework
 - 🔄 CI/CD with GitHub Actions
-- 📊 Code quality monitoring with SonarQube
-- 🔒 Automated security alerts with Dependabot
+- 🔒 Automated dependency vulnerability checks with Dependabot
 
 ## Quick Start
 
@@ -84,23 +83,13 @@ On Apple Silicon Macs, also pass `--container-architecture linux/amd64` when run
 
 ### Optional local secrets
 
-Most local runs do not need real secrets, but the `build` and `sonarqube` jobs read GitHub Actions secrets. Create a local secrets file if you want to exercise those jobs with `act`:
+Most local runs do not need real secrets, but the `build` job reads GitHub Actions secrets. Create a local secrets file if you want to exercise that job with `act`:
 
 ```bash
 cp .secrets.act.example .secrets.act
 ```
 
-Then fill in any values you need. For SonarQube local runs, set:
-
-```text
-SONAR_TOKEN=your_sonar_token
-SONAR_HOST_URL=https://sonarqube.example.com
-```
-
-Notes:
-
-- Empty `PUBLIC_SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, and `PUBLIC_GA_MEASUREMENT_ID` values are fine for most local `act` runs.
-- `sonarqube` needs real `SONAR_TOKEN` and `SONAR_HOST_URL` values.
+Empty `PUBLIC_SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, and `PUBLIC_GA_MEASUREMENT_ID` values are fine for most local `act` runs.
 
 ### Recommended jobs
 
@@ -144,7 +133,7 @@ You can attempt the full workflow with:
 act
 ```
 
-For this repository, `act` is usually most effective when run job-by-job, especially if you want fast feedback or want to avoid optional SonarQube and browser setup issues.
+For this repository, `act` is usually most effective when run job-by-job, especially if you want fast feedback or want to avoid browser setup issues.
 
 ## Development
 
@@ -157,7 +146,7 @@ All pull requests automatically run:
 - Unit tests with Vitest
 - Browser E2E checks with Robot Framework in Chrome and Firefox
 - Full production build verification, including resume PDF generation
-- Code quality analysis with SonarQube
+- Dependabot dependency vulnerability scanning (`.github/dependabot.yml`)
 
 ## License
 

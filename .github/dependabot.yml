@@ -7,16 +7,12 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "09:00"
-    # Disable automatic PR creation - only show alerts
-    open-pull-requests-limit: 0
-    # Group all updates together if PRs were enabled
+    open-pull-requests-limit: 10
+    # Group all updates into a single weekly PR to keep noise low
     groups:
       dependencies:
         patterns:
           - "*"
-    # Enable security updates only
-    # Note: With open-pull-requests-limit: 0, no PRs will be created
-    # but security alerts will still be visible in the Security tab
 
   # Monitor GitHub Actions
   - package-ecosystem: "github-actions"
@@ -25,5 +21,4 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "09:00"
-    # Disable automatic PR creation
-    open-pull-requests-limit: 0
+    open-pull-requests-limit: 5
