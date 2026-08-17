@@ -43,7 +43,7 @@
     "happy-dom": "20.11.2",
     "jsdom": "30.0.1",
     "jsonresume-theme-even": "0.26.1",
-    "jsonresume-theme-stackoverflow": "2.2.0",
+    "jsonresume-theme-stackoverflow": "3.3.0",
     "puppeteer": "25.7.0",
     "resumed": "6.1.0",
     "typescript": "5.9.3",
