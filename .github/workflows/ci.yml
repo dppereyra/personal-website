@@ -103,7 +103,7 @@ jobs:
 
       - name: Upload Robot artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: robot-results
           path: |
@@ -135,7 +135,7 @@ jobs:
         run: npm run full-build
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dist
           path: dist/
