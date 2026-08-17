@@ -41,7 +41,7 @@
     "@vitest/ui": "4.1.10",
     "daisyui": "5.7.16",
     "happy-dom": "20.11.2",
-    "jsdom": "28.1.0",
+    "jsdom": "30.0.1",
     "jsonresume-theme-even": "0.26.1",
     "jsonresume-theme-stackoverflow": "2.2.0",
     "puppeteer": "25.7.0",
