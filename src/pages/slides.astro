@@ -7,9 +7,9 @@ const allSlides = await getCollection('slides');
 const sortedSlides: CollectionEntry<'slides'>[] = sortByDate(allSlides);
 ---
 
-<Layout title="Slides - Chiff's Nook">
+<Layout title="Decks - Chiff's Nook">
   <div class="max-w-4xl mx-auto">
-    <h1 class="text-4xl font-bold mb-8">Slides</h1>
+    <h1 class="text-4xl font-bold mb-8">Decks</h1>
 
     <div class="space-y-6">
       {sortedSlides.map((deck) => (

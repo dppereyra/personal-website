@@ -39,6 +39,7 @@ robot-results/
 
 # Generated files
 public/resume.pdf
+public/slides/*.pdf
 
 # Local Netlify folder
 .netlify

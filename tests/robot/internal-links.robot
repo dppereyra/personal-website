@@ -28,3 +28,4 @@ All Internal Clickable Destinations Should Not 404
   List Should Contain Value    ${visited}    /slides
   List Should Contain Value    ${visited}    /contact
   List Should Contain Value    ${visited}    /resume.pdf
+  List Should Contain Value    ${visited}    /slides/welcome.pdf

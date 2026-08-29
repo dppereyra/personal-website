@@ -10,7 +10,7 @@
     "start": "astro dev",
     "build": "npm run full-build",
     "build:site": "astro check && astro build",
-    "full-build": "npm test && npm run generate:resume && npm run build:site",
+    "full-build": "npm test && npm run generate:resume && npm run generate:slides && npm run build:site",
     "preview": "astro preview",
     "preview:e2e": "astro preview --host 127.0.0.1 --port 4321",
     "astro": "astro",
@@ -23,7 +23,8 @@
     "test:robot:chrome": "BROWSER=chrome npm run test:robot",
     "test:robot:firefox": "BROWSER=firefox npm run test:robot",
     "test:robot:all": "npm run test:robot:chrome && npm run test:robot:firefox",
-    "generate:resume": "node scripts/generate-resume-pdf.js"
+    "generate:resume": "node scripts/generate-resume-pdf.js",
+    "generate:slides": "node scripts/generate-slide-pdfs.js"
   },
   "dependencies": {
     "@astrojs/svelte": "9.0.1",

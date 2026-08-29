@@ -19,7 +19,7 @@ Personal website and blog for www.dppereyra.com built with Astro, Svelte, Tailwi
 
 ```bash
 npm run dev              # Start development server (http://localhost:4321)
-npm run full-build       # Run tests, generate resume PDF, then build for production
+npm run full-build       # Run tests, generate resume PDF and slide deck PDFs, then build for production
 npm run build:site       # Type check and build the site only
 npm run preview          # Preview production build locally
 npm test                 # Run tests once
@@ -29,6 +29,7 @@ npm run test:coverage    # Run tests with coverage report
 npm run test:robot:chrome # Run Robot internal-link checks in Chrome
 npm run test:robot:firefox # Run Robot internal-link checks in Firefox
 npm run generate:resume  # Generate resume PDF from resume.json
+npm run generate:slides  # Generate a downloadable PDF for each slide deck
 ```
 
 ## Agent Guidelines
@@ -98,13 +99,15 @@ src/
 - Frontmatter fields: `title`, `description`, `pubDate`, `updatedDate`, `tags`
 - Posts are sorted by `pubDate` (newest first) on the homepage
 
-**Slide Deck System**: Separate Astro Content Collection, rendered with Marp
+**Slide Deck System**: Separate Astro Content Collection, rendered with Marp (nav tab labeled "Decks")
 - Slide decks are markdown files in `src/content/slides/`, kept in their own folder rather than mixed into `blog/`
 - Schema (same shape as blog posts) defined in `src/content.config.ts`
 - Frontmatter carries **both** the site's display metadata (`title`, `description`, `pubDate`, `updatedDate`, `tags`) and Marp's own directives (`marp: true`, `theme: wave`, `paginate: true`, etc.) in the same YAML block — Astro's schema ignores keys it doesn't recognize, and Marp ignores keys it doesn't recognize, so no splitting is needed
 - Rendering: `src/utils/marp.ts` uses `@marp-team/marp-core` to render a deck's raw markdown (read directly from disk via Node `fs`, not via the content collection's `.body`, since Astro strips frontmatter before exposing `.body` and Marp's own front-matter parser needs to see it) into HTML/CSS at build time. The HTML/CSS is injected inline into the page via Astro's `set:html` — no iframe, no separate static-HTML build step
 - Theme: [Wave](https://github.com/JuliusWiedemann/MarpThemeWave) (MIT), vendored at `src/styles/marp-themes/wave.css`
 - Decks are sorted by `pubDate` (newest first) on `/slides`
+- **Download PDF**: `scripts/generate-slide-pdfs.js` renders each deck (reusing `renderSlides()`) into a standalone HTML document and prints it to PDF with Puppeteer (already a dependency for the resume PDF), one page per slide via `break-after: page`. Output goes to `public/slides/<slug>.pdf` (gitignored, like `public/resume.pdf`), wired into `npm run full-build` as `generate:slides`. The deck page links to it as a "Download PDF" button
+- **View Deck (presentation mode)**: a client-side `<script>` on the deck detail page clones the already-rendered `<svg data-marpit-svg>` slides one at a time into a fullscreen overlay (`position: fixed; inset: 0`), re-wrapped in a fresh `div.marpit` so the theme's `div.marpit > svg > foreignObject > section`-scoped CSS still applies to the clone. Also requests the Fullscreen API on a best-effort basis. Click / ArrowRight / Space advances, ArrowLeft goes back, Escape (or exiting fullscreen any other way) closes it
 
 **Styling**: Tailwind CSS v4 with DaisyUI
 - Global styles in `src/styles/global.css`
