@@ -103,7 +103,9 @@ src/
 
 **Navigation**: nav tabs are, in order, Home (`/`), Blog (`/blog`), Decks (`/slides`), Work (`/work`), About (`/about`), Contact (`/contact`) — defined in `src/layouts/Layout.astro`. Keep this order when adding/removing tabs.
 
-**Home page**: `src/pages/index.astro` shows the `RECENT_ITEMS_LIMIT` (3) most recent blog posts and most recent decks side by side, each section linking through to its full listing (`/blog`, `/slides`)
+**Home page**: `src/pages/index.astro` shows the `RECENT_POSTS_LIMIT` (3) most recent blog posts and `RECENT_DECKS_LIMIT` (2) most recent decks side by side, each section linking through to its full listing (`/blog`, `/slides`)
+
+**Search & tag filtering**: `/blog` and `/slides` both use `src/components/SearchableList.svelte` (a `client:load` Svelte island) instead of a static list — a text box filters on title/description (case-insensitive substring), and clicking one or more tag chips filters to items matching any selected tag (OR), combined with the text filter (AND). Items are computed at build time from the collection and passed in as a plain serializable prop (dates as ISO strings, not `Date` objects, to survive the Astro→Svelte hydration boundary). Tests in `src/components/SearchableList.test.ts` follow the existing `Button.test.ts` pattern (`@testing-library/svelte`); interacting with the component in a test needs `await tick()` (from `'svelte'`) after dispatching an event for Svelte 5's reactivity to flush before assertions.
 
 **Blog System**: Uses Astro Content Collections
 - Blog posts are markdown files in `src/content/blog/`

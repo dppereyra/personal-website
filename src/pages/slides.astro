@@ -1,10 +1,18 @@
 ---
 import { getCollection, type CollectionEntry } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
-import { formatDate, sortByDate } from '../utils/formatDate';
+import { sortByDate } from '../utils/formatDate';
+import SearchableList from '../components/SearchableList.svelte';
 
 const allSlides = await getCollection('slides');
 const sortedSlides: CollectionEntry<'slides'>[] = sortByDate(allSlides);
+const items = sortedSlides.map((deck) => ({
+  id: deck.id,
+  title: deck.data.title,
+  description: deck.data.description,
+  pubDateIso: deck.data.pubDate.toISOString(),
+  tags: deck.data.tags,
+}));
 ---
 
 <Layout title="Decks - Chiff's Nook">
@@ -14,33 +22,6 @@ const sortedSlides: CollectionEntry<'slides'>[] = sortByDate(allSlides);
       <a href="/slides/rss.xml" class="btn btn-outline btn-sm">RSS</a>
     </div>
 
-    <div class="space-y-6">
-      {sortedSlides.map((deck) => (
-        <article class="card bg-base-200 shadow-xl relative">
-          <div class="card-body">
-            <h2 class="card-title text-2xl">
-              <a href={`/slides/${deck.id}`} class="hover:text-primary after:absolute after:inset-0">
-                {deck.data.title}
-              </a>
-            </h2>
-            <p class="text-base-content/70">
-              {deck.data.description}
-            </p>
-            <div class="flex items-center gap-4 text-sm text-base-content/60">
-              <time datetime={deck.data.pubDate.toISOString()}>
-                {formatDate(deck.data.pubDate)}
-              </time>
-              {deck.data.tags.length > 0 && (
-                <div class="flex gap-2">
-                  {deck.data.tags.map((tag: string) => (
-                    <span class="badge badge-sm">{tag}</span>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </article>
-      ))}
-    </div>
+    <SearchableList client:load items={items} basePath="/slides" emptyLabel="decks" />
   </div>
 </Layout>
