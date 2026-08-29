@@ -3,41 +3,99 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import { formatDate, sortByDate } from '../utils/formatDate';
 
+const RECENT_POSTS_LIMIT = 3;
+const RECENT_DECKS_LIMIT = 2;
+
 const allPosts = await getCollection('blog');
-const sortedPosts: CollectionEntry<'blog'>[] = sortByDate(allPosts);
+const recentPosts: CollectionEntry<'blog'>[] = sortByDate(allPosts).slice(0, RECENT_POSTS_LIMIT);
+
+const allSlides = await getCollection('slides');
+const recentSlides: CollectionEntry<'slides'>[] = sortByDate(allSlides).slice(0, RECENT_DECKS_LIMIT);
 ---
 
-<Layout title="Blog - Chiff's Nook">
+<Layout title="Chiff's Nook">
   <div class="max-w-4xl mx-auto">
-    <h1 class="text-4xl font-bold mb-8">Blog</h1>
-
-    <div class="space-y-6">
-      {sortedPosts.map((post) => (
-        <article class="card bg-base-200 shadow-xl">
-          <div class="card-body">
-            <h2 class="card-title text-2xl">
-              <a href={`/blog/${post.id}`} class="hover:text-primary">
-                {post.data.title}
-              </a>
-            </h2>
-            <p class="text-base-content/70">
-              {post.data.description}
-            </p>
-            <div class="flex items-center gap-4 text-sm text-base-content/60">
-              <time datetime={post.data.pubDate.toISOString()}>
-                {formatDate(post.data.pubDate)}
-              </time>
-              {post.data.tags.length > 0 && (
-                <div class="flex gap-2">
-                  {post.data.tags.map((tag: string) => (
-                    <span class="badge badge-sm">{tag}</span>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </article>
-      ))}
+    <div class="flex items-center justify-between mb-8">
+      <h1 class="text-4xl font-bold">Home</h1>
+      <a href="/rss.xml" class="btn btn-outline btn-sm">RSS</a>
     </div>
+
+    <section class="mb-12">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-2xl font-bold">Latest Posts</h2>
+        <a href="/blog" class="link link-primary text-sm">View all →</a>
+      </div>
+      {recentPosts.length === 0 ? (
+        <p class="text-base-content/60">No blog posts yet.</p>
+      ) : (
+        <div class="space-y-6">
+          {recentPosts.map((post) => (
+            <article class="card bg-base-200 shadow-xl relative">
+              <div class="card-body">
+                <h3 class="card-title text-2xl">
+                  <a href={`/blog/${post.id}`} class="hover:text-primary after:absolute after:inset-0">
+                    {post.data.title}
+                  </a>
+                </h3>
+                <p class="text-base-content/70">
+                  {post.data.description}
+                </p>
+                <div class="flex items-center gap-4 text-sm text-base-content/60">
+                  <time datetime={post.data.pubDate.toISOString()}>
+                    {formatDate(post.data.pubDate)}
+                  </time>
+                  {post.data.tags.length > 0 && (
+                    <div class="flex gap-2">
+                      {post.data.tags.map((tag: string) => (
+                        <span class="badge badge-sm">{tag}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+
+    <section>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-2xl font-bold">Latest Decks</h2>
+        <a href="/slides" class="link link-primary text-sm">View all →</a>
+      </div>
+      {recentSlides.length === 0 ? (
+        <p class="text-base-content/60">No decks yet.</p>
+      ) : (
+        <div class="space-y-6">
+          {recentSlides.map((deck) => (
+            <article class="card bg-base-200 shadow-xl relative">
+              <div class="card-body">
+                <h3 class="card-title text-2xl">
+                  <a href={`/slides/${deck.id}`} class="hover:text-primary after:absolute after:inset-0">
+                    {deck.data.title}
+                  </a>
+                </h3>
+                <p class="text-base-content/70">
+                  {deck.data.description}
+                </p>
+                <div class="flex items-center gap-4 text-sm text-base-content/60">
+                  <time datetime={deck.data.pubDate.toISOString()}>
+                    {formatDate(deck.data.pubDate)}
+                  </time>
+                  {deck.data.tags.length > 0 && (
+                    <div class="flex gap-2">
+                      {deck.data.tags.map((tag: string) => (
+                        <span class="badge badge-sm">{tag}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
   </div>
 </Layout>

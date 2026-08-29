@@ -1,0 +1,145 @@
+---
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import { formatDate } from '../../utils/formatDate';
+import { renderSlides } from '../../utils/marp';
+
+export async function getStaticPaths() {
+  const decks = await getCollection('slides');
+  return decks.map((deck: CollectionEntry<'slides'>) => ({
+    params: { slug: deck.id },
+    props: deck,
+  }));
+}
+
+const deck: CollectionEntry<'slides'> = Astro.props;
+
+// Read the raw markdown (frontmatter included) directly from disk rather than
+// via the content collection's `.body`, which has the frontmatter already
+// stripped by Astro's loader. Marp's own front-matter parser needs to see
+// `theme:`/`paginate:` etc. directly in the text passed to it.
+const rawMarkdownPath = join(process.cwd(), 'src/content/slides', `${deck.id}.md`);
+const rawMarkdown = readFileSync(rawMarkdownPath, 'utf-8');
+const { html, css } = renderSlides(rawMarkdown);
+---
+
+<Layout title={deck.data.title} description={deck.data.description}>
+  <article class="max-w-3xl mx-auto">
+    <header class="mb-8">
+      <a href="/slides" class="btn btn-ghost btn-sm mb-4">← Back to Decks</a>
+      <h1 class="text-4xl font-bold mb-4">{deck.data.title}</h1>
+      <div class="flex items-center gap-4 text-sm text-base-content/60 mb-4">
+        <time datetime={deck.data.pubDate.toISOString()}>
+          {formatDate(deck.data.pubDate)}
+        </time>
+        {deck.data.tags.length > 0 && (
+          <div class="flex gap-2">
+            {deck.data.tags.map((tag: string) => (
+              <span class="badge badge-sm">{tag}</span>
+            ))}
+          </div>
+        )}
+      </div>
+      <div class="flex gap-3">
+        <a href={`/slides/${deck.id}.pdf`} class="btn btn-outline btn-sm">Download PDF</a>
+        <button type="button" id="view-deck-btn" class="btn btn-primary btn-sm">View Deck</button>
+      </div>
+    </header>
+
+    <style set:html={css} />
+    {/* marp-core's rendered `html` already includes its own .marpit wrapper */}
+    <div id="marp-deck" set:html={html} />
+  </article>
+
+  <div
+    id="presentation-overlay"
+    class="fixed inset-0 z-50 hidden bg-black items-center justify-center"
+  >
+    <div id="presentation-slide" class="w-full h-full flex items-center justify-center p-4"></div>
+  </div>
+</Layout>
+
+<script>
+  const viewDeckBtn = document.getElementById('view-deck-btn');
+  const overlay = document.getElementById('presentation-overlay');
+  const slideContainer = document.getElementById('presentation-slide');
+  const deckEl = document.getElementById('marp-deck');
+
+  if (viewDeckBtn && overlay && slideContainer && deckEl) {
+    const slides = Array.from(deckEl.querySelectorAll('svg[data-marpit-svg]'));
+    let current = 0;
+
+    const showSlide = (index: number) => {
+      slideContainer.innerHTML = '';
+      // The deck's theme CSS is scoped to `div.marpit > svg > foreignObject`,
+      // so the clone needs its own .marpit wrapper to pick the theme back up.
+      const wrapper = document.createElement('div');
+      wrapper.className = 'marpit';
+      wrapper.style.width = '100%';
+      wrapper.style.maxWidth = 'min(100%, calc(100vh * 16 / 9))';
+      wrapper.style.aspectRatio = '16 / 9';
+      const clone = slides[index].cloneNode(true) as SVGElement;
+      clone.style.display = 'block';
+      clone.style.width = '100%';
+      clone.style.height = '100%';
+      wrapper.appendChild(clone);
+      slideContainer.appendChild(wrapper);
+    };
+
+    const openPresentation = async () => {
+      if (slides.length === 0) return;
+      current = 0;
+      showSlide(current);
+      overlay.classList.remove('hidden');
+      overlay.classList.add('flex');
+      try {
+        await overlay.requestFullscreen?.();
+      } catch {
+        // Fullscreen may be unavailable/denied — the fixed overlay still
+        // covers the viewport, so presentation mode still works.
+      }
+    };
+
+    const closePresentation = () => {
+      overlay.classList.add('hidden');
+      overlay.classList.remove('flex');
+      if (document.fullscreenElement === overlay) {
+        document.exitFullscreen().catch(() => {});
+      }
+    };
+
+    const next = () => {
+      if (current < slides.length - 1) {
+        current += 1;
+        showSlide(current);
+      }
+    };
+
+    const prev = () => {
+      if (current > 0) {
+        current -= 1;
+        showSlide(current);
+      }
+    };
+
+    viewDeckBtn.addEventListener('click', openPresentation);
+    overlay.addEventListener('click', next);
+
+    document.addEventListener('keydown', (event) => {
+      if (overlay.classList.contains('hidden')) return;
+      if (event.key === 'Escape') closePresentation();
+      else if (event.key === 'ArrowRight' || event.key === ' ') next();
+      else if (event.key === 'ArrowLeft') prev();
+    });
+
+    // Browsers exit fullscreen natively on Escape; sync our overlay state
+    // when that happens (or when fullscreen is exited any other way).
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement && !overlay.classList.contains('hidden')) {
+        closePresentation();
+      }
+    });
+  }
+</script>

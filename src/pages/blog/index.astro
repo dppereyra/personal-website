@@ -1,0 +1,27 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import { sortByDate } from '../../utils/formatDate';
+import SearchableList from '../../components/SearchableList.svelte';
+
+const allPosts = await getCollection('blog');
+const sortedPosts: CollectionEntry<'blog'>[] = sortByDate(allPosts);
+const items = sortedPosts.map((post) => ({
+  id: post.id,
+  title: post.data.title,
+  description: post.data.description,
+  pubDateIso: post.data.pubDate.toISOString(),
+  tags: post.data.tags,
+}));
+---
+
+<Layout title="Blog - Chiff's Nook">
+  <div class="max-w-4xl mx-auto">
+    <div class="flex items-center justify-between mb-8">
+      <h1 class="text-4xl font-bold">Blog</h1>
+      <a href="/blog/rss.xml" class="btn btn-outline btn-sm">RSS</a>
+    </div>
+
+    <SearchableList client:load items={items} basePath="/blog" emptyLabel="posts" />
+  </div>
+</Layout>

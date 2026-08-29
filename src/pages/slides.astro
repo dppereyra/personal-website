@@ -1,0 +1,27 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import { sortByDate } from '../utils/formatDate';
+import SearchableList from '../components/SearchableList.svelte';
+
+const allSlides = await getCollection('slides');
+const sortedSlides: CollectionEntry<'slides'>[] = sortByDate(allSlides);
+const items = sortedSlides.map((deck) => ({
+  id: deck.id,
+  title: deck.data.title,
+  description: deck.data.description,
+  pubDateIso: deck.data.pubDate.toISOString(),
+  tags: deck.data.tags,
+}));
+---
+
+<Layout title="Decks - Chiff's Nook">
+  <div class="max-w-4xl mx-auto">
+    <div class="flex items-center justify-between mb-8">
+      <h1 class="text-4xl font-bold">Decks</h1>
+      <a href="/slides/rss.xml" class="btn btn-outline btn-sm">RSS</a>
+    </div>
+
+    <SearchableList client:load items={items} basePath="/slides" emptyLabel="decks" />
+  </div>
+</Layout>
