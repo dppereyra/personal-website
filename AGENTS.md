@@ -307,8 +307,19 @@ Configured for Netlify deployment via netlify-cli. The site is configured for ww
 - `staging` - staging branch/site, protected
 - `production` - production branch/site, protected
 
-**Promotion flow**: changes land on `master` first, then flow forward one branch at a time via pull request — never push or merge directly into `staging` or `production`:
-1. PR from `master` → `staging`
-2. Once verified on staging, PR from `staging` → `production`
+**Promotion flow**: changes land on `master` first, then flow forward one branch at a time via pull request — never push or merge directly into `staging` or `production`. `staging` and `production` are protected branches, so direct pushes are rejected and this PR-based promotion is the only way changes reach them.
 
-`staging` and `production` are configured as protected branches, so direct pushes are rejected and this PR-based promotion is the only way changes reach them.
+**Full development loop** (the whole sequence, not just the branch promotion):
+1. Write tests first, before the implementation they cover
+2. Get security input before writing code that touches auth, dependencies, secrets, or anything externally exposed (new endpoints, headers, forms) — not just a post-hoc review after the fact
+3. Write the implementation
+4. Push to `master`
+5. Open a PR from `master` → `staging`
+6. Wait for the PR's Netlify deploy preview, then have it verified — both a QA pass (exercise the actual feature in a real browser, not just unit tests) and a security pass (for anything touching the areas in step 2) — against that deploy preview
+7. Merge to `staging`
+8. Run another QA/security round against the real, now-deployed `staging` site itself — deploy-preview behavior isn't guaranteed identical to a real deploy (response headers, env-var-dependent branching, etc. can differ)
+9. Once `staging` is verified, open a PR from `staging` → `production`
+10. Wait for that PR's deploy preview and have it checked by QA/security too, same as step 6
+11. Merge to `production`
+
+Steps 6–8 and 10 are real verification gates, not formalities — confirm the actual behavior (build a fresh local build, curl the live headers/feeds, drive a real browser) rather than trusting a report at face value. Production only ever gets touched via step 9–11, and only once staging is actually confirmed good, not just "PR opened."
