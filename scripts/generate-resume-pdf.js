@@ -34,6 +34,18 @@ if (!existsSync(resumeJsonPath)) {
 }
 
 try {
+  // Ensure Puppeteer's Chrome build is actually present before resumed tries to
+  // launch it. Relying solely on Puppeteer's own postinstall script is fragile
+  // on hosts with a persistent build cache (e.g. Netlify's /opt/buildhome/.cache):
+  // after a Puppeteer version bump, the cache can still hold an older Chrome
+  // build while the installed Puppeteer version expects a newer one, and
+  // launch then fails with "Could not find Chrome (ver. ...)".
+  console.log('🌐 Ensuring Puppeteer Chrome build is installed...');
+  execSync('npx puppeteer browsers install chrome', {
+    stdio: 'inherit',
+    cwd: projectRoot
+  });
+
   // Generate PDF using resumed CLI
   // Note: resumed creates the file in the current directory with the name "resume.pdf"
   console.log('🔨 Running resumed export...');
@@ -69,7 +81,5 @@ try {
 
 } catch (error) {
   console.error('❌ Error generating resume PDF:', error.message);
-
-  console.warn('💡 Tip: Make sure your resume.json is valid JSON Resume format');
   process.exit(1);
 }

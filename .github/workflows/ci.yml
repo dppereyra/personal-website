@@ -81,7 +81,7 @@ jobs:
         run: pip install -r requirements-robot.txt
 
       - name: Setup Chrome
-        uses: browser-actions/setup-chrome@v1
+        uses: browser-actions/setup-chrome@v2
 
       - name: Setup Firefox
         uses: browser-actions/setup-firefox@v1
