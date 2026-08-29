@@ -1,6 +1,13 @@
 # personal-website
 
-[![CI](https://github.com/dppereyra/personal-website/actions/workflows/ci.yml/badge.svg)](https://github.com/dppereyra/personal-website/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/dppereyra/personal-website/ci.yml?branch=master&label=CI&logo=githubactions&logoColor=white)](https://github.com/dppereyra/personal-website/actions/workflows/ci.yml)
+[![License: Apache-2.0](https://img.shields.io/github/license/dppereyra/personal-website?color=blue)](./LICENSE)
+[![Astro](https://img.shields.io/badge/Astro-7-BC52EE?logo=astro&logoColor=white)](https://astro.build)
+[![Svelte](https://img.shields.io/badge/Svelte-5-FF3E00?logo=svelte&logoColor=white)](https://svelte.dev)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Node](https://img.shields.io/badge/node-%3E%3D24-339933?logo=node.js&logoColor=white)](https://nodejs.org)
+[![Deployed on Netlify](https://img.shields.io/badge/deployed_on-Netlify-00C7B7?logo=netlify&logoColor=white)](https://www.netlify.com)
 
 Personal website and blog built with Astro, Svelte, Tailwind CSS, and DaisyUI.
 
@@ -159,4 +166,4 @@ All pull requests automatically run:
 
 ## License
 
-Personal project - All rights reserved
+Licensed under the [Apache License 2.0](./LICENSE).
