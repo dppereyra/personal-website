@@ -29,10 +29,10 @@ const recentSlides: CollectionEntry<'slides'>[] = sortByDate(allSlides).slice(0,
       ) : (
         <div class="space-y-6">
           {recentPosts.map((post) => (
-            <article class="card bg-base-200 shadow-xl">
+            <article class="card bg-base-200 shadow-xl relative">
               <div class="card-body">
                 <h3 class="card-title text-2xl">
-                  <a href={`/blog/${post.id}`} class="hover:text-primary">
+                  <a href={`/blog/${post.id}`} class="hover:text-primary after:absolute after:inset-0">
                     {post.data.title}
                   </a>
                 </h3>
@@ -68,10 +68,10 @@ const recentSlides: CollectionEntry<'slides'>[] = sortByDate(allSlides).slice(0,
       ) : (
         <div class="space-y-6">
           {recentSlides.map((deck) => (
-            <article class="card bg-base-200 shadow-xl">
+            <article class="card bg-base-200 shadow-xl relative">
               <div class="card-body">
                 <h3 class="card-title text-2xl">
-                  <a href={`/slides/${deck.id}`} class="hover:text-primary">
+                  <a href={`/slides/${deck.id}`} class="hover:text-primary after:absolute after:inset-0">
                     {deck.data.title}
                   </a>
                 </h3>
