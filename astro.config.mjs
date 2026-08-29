@@ -9,7 +9,7 @@ import sentry from '@sentry/astro';
 const branch = process.env.BRANCH ?? process.env.HEAD;
 const site = process.env.SITE_URL
   ?? (branch === 'staging'
-    ? 'https://personal-website-staging.netlify.app'
+    ? 'https://www-dppereyra-staging.netlify.app'
     : branch === 'production'
       ? 'https://www.dppereyra.com'
       : 'http://localhost:4321');
