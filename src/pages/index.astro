@@ -3,13 +3,14 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import { formatDate, sortByDate } from '../utils/formatDate';
 
-const RECENT_ITEMS_LIMIT = 3;
+const RECENT_POSTS_LIMIT = 3;
+const RECENT_DECKS_LIMIT = 2;
 
 const allPosts = await getCollection('blog');
-const recentPosts: CollectionEntry<'blog'>[] = sortByDate(allPosts).slice(0, RECENT_ITEMS_LIMIT);
+const recentPosts: CollectionEntry<'blog'>[] = sortByDate(allPosts).slice(0, RECENT_POSTS_LIMIT);
 
 const allSlides = await getCollection('slides');
-const recentSlides: CollectionEntry<'slides'>[] = sortByDate(allSlides).slice(0, RECENT_ITEMS_LIMIT);
+const recentSlides: CollectionEntry<'slides'>[] = sortByDate(allSlides).slice(0, RECENT_DECKS_LIMIT);
 ---
 
 <Layout title="Chiff's Nook">
