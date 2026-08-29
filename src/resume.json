@@ -15,9 +15,9 @@
     },
     "profiles": [
       {
-        "network": "Twitter",
+        "network": "X",
         "username": "dptpereyra",
-        "url": "https://twitter.com/dptpereyra"
+        "url": "https://x.com/dptpereyra"
       },
       {
         "network": "LinkedIn",
@@ -27,17 +27,12 @@
       {
         "network": "GitHub",
         "username": "dppereyra",
-        "url": "https://github.com/dennisphilippe-pereyra-cla"
+        "url": "https://github.com/dppereyra"
       },
       {
         "network": "GitLab",
         "username": "dppereyra",
         "url": "https://gitlab.com/dppereyra"
-      },
-      {
-        "network": "Pluralsight",
-        "username": "dppereyra",
-        "url": "https://app.pluralsight.com/profile/dppereyra"
       }
     ]
   },
@@ -268,7 +263,9 @@
       "name": "Cloud Technology",
       "keywords": [
         "AWS",
-        "Azure"
+        "Azure",
+        "GCP",
+        "Netlify"
       ]
     },
     {
@@ -294,7 +291,11 @@
       "keywords": [
         "Argo",
         "Flux",
-        "Istio"
+        "Istio",
+        "Cert Manager",
+        "Kiali",
+        "Kyverno",
+        "KEDA"
       ]
     },
     {
@@ -304,7 +305,10 @@
         "ELK Stack",
         "Jaeger",
         "Dynatrace",
-        "New Relic"
+        "New Relic",
+        "OpsGenie",
+        "PagerDuty",
+        "Sentry"
       ]
     },
     {
@@ -312,6 +316,7 @@
       "keywords": [
         "Kubernetes",
         "Openshift",
+        "Nomad",
         "Docker",
         "Packer"
       ]
@@ -358,7 +363,7 @@
         "Github Copilot",
         "OpenAI Codex",
         "Claude Code",
-        "Agents.md"
+        "AGENTS.md"
       ]
     }
   ],
