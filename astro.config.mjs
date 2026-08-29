@@ -6,13 +6,13 @@ import tailwindcss from '@tailwindcss/vite';
 
 import sentry from '@sentry/astro';
 
-const branch = process.env.BRANCH ?? process.env.HEAD;
+// DEPLOY_PRIME_URL is set by Netlify on every build (production, branch
+// deploys, and PR deploy previews alike) to that specific deploy's real
+// URL, so it covers all Netlify contexts without hardcoding branch names
+// or domains here.
 const site = process.env.SITE_URL
-  ?? (branch === 'staging'
-    ? 'https://www-dppereyra-staging.netlify.app'
-    : branch === 'production'
-      ? 'https://www.dppereyra.com'
-      : 'http://localhost:4321');
+  ?? process.env.DEPLOY_PRIME_URL
+  ?? 'http://localhost:4321';
 
 // https://astro.build/config
 export default defineConfig({

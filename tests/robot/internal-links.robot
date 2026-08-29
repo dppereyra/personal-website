@@ -14,7 +14,7 @@ All Internal Clickable Destinations Should Not 404
     END
     Append To List    ${visited}    ${path}
     Assert Internal Destination Loads    ${path}
-    IF    not '${path}'.endswith('.pdf')
+    IF    not ('${path}'.endswith('.pdf') or '${path}'.endswith('.xml'))
       ${links}=    Collect Internal Links From Current Page
       FOR    ${link}    IN    @{links}
         IF    $link not in $visited and $link not in $queue
@@ -25,6 +25,11 @@ All Internal Clickable Destinations Should Not 404
   END
   List Should Contain Value    ${visited}    /about
   List Should Contain Value    ${visited}    /work
-  List Should Contain Value    ${visited}    /projects
+  List Should Contain Value    ${visited}    /blog
+  List Should Contain Value    ${visited}    /slides
   List Should Contain Value    ${visited}    /contact
   List Should Contain Value    ${visited}    /resume.pdf
+  List Should Contain Value    ${visited}    /slides/welcome.pdf
+  List Should Contain Value    ${visited}    /rss.xml
+  List Should Contain Value    ${visited}    /blog/rss.xml
+  List Should Contain Value    ${visited}    /slides/rss.xml

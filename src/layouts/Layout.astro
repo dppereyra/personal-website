@@ -30,6 +30,10 @@ const { title, description = 'Personal website and blog' } = Astro.props;
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
 
+    <link rel="alternate" type="application/rss+xml" title="Chiff's Nook" href="/rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title="Chiff's Nook — Blog" href="/blog/rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title="Chiff's Nook — Decks" href="/slides/rss.xml" />
+
     {/* Google Analytics - Only loads if GA_MEASUREMENT_ID is set */}
     {import.meta.env.PUBLIC_GA_MEASUREMENT_ID && (
       <>
@@ -72,9 +76,10 @@ const { title, description = 'Personal website and blog' } = Astro.props;
         </div>
         <div class="flex-none flex items-center gap-1">
           <ul class="menu menu-horizontal px-1 flex-wrap">
-            <li><a href="/">Blog</a></li>
+            <li><a href="/">Home</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/slides">Decks</a></li>
             <li><a href="/work">Work</a></li>
-            <li><a href="/projects">Projects</a></li>
             <li><a href="/about">About</a></li>
             <li><a href="/contact">Contact</a></li>
           </ul>

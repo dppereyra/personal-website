@@ -10,7 +10,7 @@
     "start": "astro dev",
     "build": "npm run full-build",
     "build:site": "astro check && astro build",
-    "full-build": "npm test && npm run generate:resume && npm run build:site",
+    "full-build": "npm test && npm run generate:resume && npm run generate:slides && npm run build:site",
     "preview": "astro preview",
     "preview:e2e": "astro preview --host 127.0.0.1 --port 4321",
     "astro": "astro",
@@ -23,9 +23,11 @@
     "test:robot:chrome": "BROWSER=chrome npm run test:robot",
     "test:robot:firefox": "BROWSER=firefox npm run test:robot",
     "test:robot:all": "npm run test:robot:chrome && npm run test:robot:firefox",
-    "generate:resume": "node scripts/generate-resume-pdf.js"
+    "generate:resume": "node scripts/generate-resume-pdf.js",
+    "generate:slides": "node scripts/generate-slide-pdfs.js"
   },
   "dependencies": {
+    "@astrojs/rss": "^4.0.19",
     "@astrojs/svelte": "9.0.1",
     "@tailwindcss/vite": "4.3.3",
     "astro": "7.2.4",
@@ -34,6 +36,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",
+    "@marp-team/marp-core": "^4.4.0",
     "@sentry/astro": "10.70.0",
     "@testing-library/dom": "10.4.1",
     "@testing-library/svelte": "5.4.2",

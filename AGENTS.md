@@ -19,7 +19,7 @@ Personal website and blog for www.dppereyra.com built with Astro, Svelte, Tailwi
 
 ```bash
 npm run dev              # Start development server (http://localhost:4321)
-npm run full-build       # Run tests, generate resume PDF, then build for production
+npm run full-build       # Run tests, generate resume PDF and slide deck PDFs, then build for production
 npm run build:site       # Type check and build the site only
 npm run preview          # Preview production build locally
 npm test                 # Run tests once
@@ -29,6 +29,7 @@ npm run test:coverage    # Run tests with coverage report
 npm run test:robot:chrome # Run Robot internal-link checks in Chrome
 npm run test:robot:firefox # Run Robot internal-link checks in Firefox
 npm run generate:resume  # Generate resume PDF from resume.json
+npm run generate:slides  # Generate a downloadable PDF for each slide deck
 ```
 
 ## Agent Guidelines
@@ -55,41 +56,77 @@ To start developing:
 
 ```
 src/
+├── content.config.ts   # Content collections schema (blog posts, slide decks)
 ├── content/
-│   ├── config.ts       # Content collections schema (blog posts)
-│   └── blog/           # Blog post markdown files
+│   ├── blog/            # Blog post markdown files
+│   └── slides/          # Marp slide deck markdown files
 ├── layouts/
 │   └── Layout.astro    # Main layout with navigation and footer
 ├── pages/
-│   ├── index.astro     # Blog listing (homepage)
+│   ├── index.astro     # Home (latest posts + latest decks)
+│   ├── rss.xml.js       # Combined RSS feed (posts + decks)
 │   ├── about.astro     # About page (pulls from resume.json)
 │   ├── contact.astro   # Contact page
 │   ├── work.astro      # Work history (from resume.json)
-│   ├── projects.astro  # Project portfolio (from resume.json)
-│   └── blog/
-│       └── [...slug].astro  # Dynamic blog post pages
+│   ├── slides.astro    # Slide deck listing
+│   ├── blog/
+│   │   ├── index.astro       # Blog listing
+│   │   ├── rss.xml.js         # Blog-only RSS feed
+│   │   └── [...slug].astro   # Dynamic blog post pages
+│   └── slides/
+│       ├── rss.xml.js         # Decks-only RSS feed
+│       └── [...slug].astro   # Dynamic slide deck pages
 ├── styles/
-│   └── global.css      # Tailwind CSS imports and DaisyUI plugin
+│   ├── global.css      # Tailwind CSS imports and DaisyUI plugin
+│   └── marp-themes/    # Vendored Marp theme CSS (e.g. wave.css)
 ├── types/
 │   └── resume.ts       # JSON Resume schema TypeScript types
+├── utils/
+│   └── marp.ts          # Marp deck rendering helper (marp-core)
 └── resume.json         # JSON Resume data (update with your info)
 ```
 
 ## Architecture
 
 **Routing**: File-based routing in `src/pages/`
-- `index.astro` → `/` (blog listing)
+- `index.astro` → `/` (Home: latest posts + latest decks)
+- `rss.xml.js` → `/rss.xml` (combined RSS feed)
+- `blog/index.astro` → `/blog` (blog listing)
+- `blog/rss.xml.js` → `/blog/rss.xml` (blog-only RSS feed)
 - `about.astro` → `/about` (displays info from resume.json)
 - `work.astro` → `/work` (work history from resume.json)
-- `projects.astro` → `/projects` (project portfolio from resume.json)
+- `slides.astro` → `/slides` (slide deck listing)
+- `slides/rss.xml.js` → `/slides/rss.xml` (decks-only RSS feed)
 - `contact.astro` → `/contact`
 - `blog/[...slug].astro` → `/blog/{slug}` (dynamic routes)
+- `slides/[...slug].astro` → `/slides/{slug}` (dynamic routes)
+
+**Navigation**: nav tabs are, in order, Home (`/`), Blog (`/blog`), Decks (`/slides`), Work (`/work`), About (`/about`), Contact (`/contact`) — defined in `src/layouts/Layout.astro`. Keep this order when adding/removing tabs.
+
+**Home page**: `src/pages/index.astro` shows the `RECENT_ITEMS_LIMIT` (3) most recent blog posts and most recent decks side by side, each section linking through to its full listing (`/blog`, `/slides`)
 
 **Blog System**: Uses Astro Content Collections
 - Blog posts are markdown files in `src/content/blog/`
-- Schema defined in `src/content/config.ts`
+- Schema defined in `src/content.config.ts`
 - Frontmatter fields: `title`, `description`, `pubDate`, `updatedDate`, `tags`
-- Posts are sorted by `pubDate` (newest first) on the homepage
+- Posts are sorted by `pubDate` (newest first) on `/blog`
+
+**Slide Deck System**: Separate Astro Content Collection, rendered with Marp (nav tab labeled "Decks")
+- Slide decks are markdown files in `src/content/slides/`, kept in their own folder rather than mixed into `blog/`
+- Schema (same shape as blog posts) defined in `src/content.config.ts`
+- Frontmatter carries **both** the site's display metadata (`title`, `description`, `pubDate`, `updatedDate`, `tags`) and Marp's own directives (`marp: true`, `theme: wave`, `paginate: true`, etc.) in the same YAML block — Astro's schema ignores keys it doesn't recognize, and Marp ignores keys it doesn't recognize, so no splitting is needed
+- Rendering: `src/utils/marp.ts` uses `@marp-team/marp-core` to render a deck's raw markdown (read directly from disk via Node `fs`, not via the content collection's `.body`, since Astro strips frontmatter before exposing `.body` and Marp's own front-matter parser needs to see it) into HTML/CSS at build time. The HTML/CSS is injected inline into the page via Astro's `set:html` — no iframe, no separate static-HTML build step
+- Theme: [Wave](https://github.com/JuliusWiedemann/MarpThemeWave) (MIT), vendored at `src/styles/marp-themes/wave.css`
+- Decks are sorted by `pubDate` (newest first) on `/slides`
+- **Download PDF**: `scripts/generate-slide-pdfs.js` renders each deck (reusing `renderSlides()`) into a standalone HTML document and prints it to PDF with Puppeteer (already a dependency for the resume PDF), one page per slide via `break-after: page`. Output goes to `public/slides/<slug>.pdf` (gitignored, like `public/resume.pdf`), wired into `npm run full-build` as `generate:slides`. The deck page links to it as a "Download PDF" button
+- **View Deck (presentation mode)**: a client-side `<script>` on the deck detail page clones the already-rendered `<svg data-marpit-svg>` slides one at a time into a fullscreen overlay (`position: fixed; inset: 0`), re-wrapped in a fresh `div.marpit` so the theme's `div.marpit > svg > foreignObject > section`-scoped CSS still applies to the clone. Also requests the Fullscreen API on a best-effort basis. Click / ArrowRight / Space advances, ArrowLeft goes back, Escape (or exiting fullscreen any other way) closes it
+
+**Syndication (RSS)**: three RSS 2.0 feeds, built with the official `@astrojs/rss` package (needs `astro.config.mjs`'s `site` option, already set)
+- `/rss.xml` — combined feed: latest posts and decks merged and sorted by `pubDate`, each item tagged with a `post`/`deck` category
+- `/blog/rss.xml` — blog posts only
+- `/slides/rss.xml` — decks only
+- All three are advertised via `<link rel="alternate" type="application/rss+xml">` in `Layout.astro`'s `<head>` (so browsers/readers auto-discover them on every page), plus a visible "RSS" button on the Home, Blog, and Decks listing pages linking to the matching feed
+- Atom was considered and intentionally skipped — RSS 2.0 alone covers virtually every feed reader; add an Atom variant only if a specific consumer actually requires it
 
 **Styling**: Tailwind CSS v4 with DaisyUI
 - Global styles in `src/styles/global.css`
@@ -118,6 +155,34 @@ Your markdown content here...
 
 The post will automatically appear on the homepage and be accessible at `/blog/{filename}`.
 
+## Adding Slide Decks
+
+Create a new markdown file in `src/content/slides/`:
+
+```markdown
+---
+marp: true
+theme: wave
+paginate: true
+title: 'Deck Title'
+description: 'Brief description'
+pubDate: 2026-02-03
+tags: ['tag1', 'tag2']
+---
+
+# First Slide
+
+Content...
+
+---
+
+## Second Slide
+
+Content...
+```
+
+Slides are separated by `---` on its own line. The deck will automatically appear on `/slides` and be accessible at `/slides/{filename}`.
+
 ## JSON Resume Integration
 
 The site uses [JSON Resume](https://jsonresume.org/) schema for structured resume data.
@@ -129,7 +194,6 @@ The site uses [JSON Resume](https://jsonresume.org/) schema for structured resum
 **Pages Using Resume Data**:
 - `/about` - Displays basics, skills, interests, and social profiles
 - `/work` - Shows work history with positions, companies, dates, and highlights
-- `/projects` - Displays project portfolio with descriptions, technologies, and links
 
 **Updating Your Resume**:
 1. Edit `src/resume.json` with your information
