@@ -1,0 +1,175 @@
+---
+import Layout from '../layouts/Layout.astro';
+import type { Resume } from '../types/resume';
+import resumeData from '../resume.json';
+import SocialIcon from '../components/SocialIcon.astro';
+import { PROFILE_IMAGE_URL } from '../consts';
+
+const resume = resumeData as Resume;
+const basics = resume.basics || {};
+const skills = resume.skills || [];
+const interests = resume.interests || [];
+// Pluralsight stays in the sidebar only, not in this social media list.
+const socialProfiles = (basics.profiles || []).filter(
+  (profile) => profile.network?.toLowerCase() !== 'pluralsight'
+);
+---
+
+<Layout title="About - Chiff's Nook" description={basics.summary || "About me"}>
+  <div class="max-w-3xl mx-auto">
+    <h1 class="text-4xl font-bold mb-8">About Me</h1>
+
+    <div class="card bg-base-200 shadow-xl mb-6">
+      <div class="card-body">
+        <div class="flex flex-col md:flex-row gap-8 items-center md:items-start">
+          <div class="flex-shrink-0 relative">
+            <div class="relative">
+              <div class="absolute inset-0 rounded-full border-4 border-primary"></div>
+              <img
+                src={PROFILE_IMAGE_URL}
+                alt={basics.name}
+                class="w-40 h-40 rounded-full object-cover relative"
+              />
+            </div>
+          </div>
+
+          <div class="flex-1 relative">
+            <div class="hidden md:block absolute left-0 top-0 w-12 h-0.5 bg-primary -ml-12 mt-20"></div>
+
+            {basics.name && (
+              <h2 class="card-title text-3xl mb-2 font-bold">{basics.name}</h2>
+            )}
+
+            {basics.label && (
+              <div class="flex items-start gap-4 mb-4">
+                <div class="hidden md:block w-0.5 h-8 bg-primary mt-1"></div>
+                <p class="text-lg text-primary font-semibold">{basics.label}</p>
+              </div>
+            )}
+
+            {basics.summary && (
+              <p class="text-base-content/80 mb-4 ml-0 md:ml-4">{basics.summary}</p>
+            )}
+
+            <div class="mt-4 ml-0 md:ml-4">
+              <a
+                href="/resume.pdf"
+                class="btn btn-primary btn-sm gap-2"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Download Resume (PDF)
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {basics.location && (basics.location.city || basics.location.region) && (
+      <div class="card bg-base-200 shadow-xl mb-6">
+        <div class="card-body">
+          <h3 class="card-title">Location</h3>
+          <p class="text-base-content/80">
+            {[basics.location.city, basics.location.region, basics.location.countryCode]
+              .filter(Boolean)
+              .join(', ')}
+          </p>
+        </div>
+      </div>
+    )}
+
+    {socialProfiles.length > 0 && (
+      <div class="card bg-base-200 shadow-xl mb-6">
+        <div class="card-body">
+          <h3 class="card-title mb-4">Connect</h3>
+          <div class="flex flex-wrap gap-3">
+            {socialProfiles.map((profile) => (
+              <a
+                href={profile.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn btn-outline btn-sm gap-2"
+              >
+                <SocialIcon network={profile.network} class="h-4 w-4" />
+                {profile.network}
+              </a>
+            ))}
+          </div>
+          {basics.email && (
+            <div class="mt-4">
+              <a href={`mailto:${basics.email}`} class="link link-primary flex items-center gap-2 w-fit">
+                <SocialIcon network="email" class="h-4 w-4" />
+                {basics.email}
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+    )}
+
+    {skills.length > 0 && (
+      <div class="card bg-base-200 shadow-xl mb-6">
+        <div class="card-body">
+          <h3 class="card-title mb-4">Skills</h3>
+          <div class="space-y-4">
+            {skills.map((skill) => (
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="font-semibold">{skill.name}</span>
+                  {skill.level && (
+                    <span class="badge badge-primary badge-sm">{skill.level}</span>
+                  )}
+                </div>
+                {skill.keywords && skill.keywords.length > 0 && (
+                  <div class="flex flex-wrap gap-2">
+                    {skill.keywords.map((keyword) => (
+                      <span class="badge badge-sm">{keyword}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )}
+
+    {interests.length > 0 && (
+      <div class="card bg-base-200 shadow-xl mb-6">
+        <div class="card-body">
+          <h3 class="card-title mb-4">Interests</h3>
+          <div class="space-y-3">
+            {interests.map((interest) => (
+              <div>
+                <div class="font-semibold mb-2">{interest.name}</div>
+                {interest.keywords && interest.keywords.length > 0 && (
+                  <div class="flex flex-wrap gap-2">
+                    {interest.keywords.map((keyword) => (
+                      <span class="badge badge-outline badge-sm">{keyword}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )}
+
+    <div class="card bg-base-200 shadow-xl">
+      <div class="card-body">
+        <h3 class="card-title mb-4">About This Website</h3>
+        <p class="text-base-content/80 mb-4">
+          This website is built with Astro, Svelte, Tailwind CSS, and DaisyUI.
+          It's deployed on Netlify for fast, reliable hosting.
+        </p>
+        <div class="flex gap-3">
+          <a href="/work" class="btn btn-primary btn-sm">View Work History</a>
+          <a href="/projects" class="btn btn-primary btn-sm">View Projects</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

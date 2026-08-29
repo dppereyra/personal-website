@@ -2,6 +2,9 @@
   "name": "personal-website",
   "type": "module",
   "version": "0.0.1",
+  "engines": {
+    "node": ">=24 <25"
+  },
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -9,35 +12,46 @@
     "build:site": "astro check && astro build",
     "full-build": "npm test && npm run generate:resume && npm run build:site",
     "preview": "astro preview",
+    "preview:e2e": "astro preview --host 127.0.0.1 --port 4321",
     "astro": "astro",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
+    "test:robot:install": "python3 -m venv .venv-robot && ./.venv-robot/bin/python -m pip install -r requirements-robot.txt",
+    "test:robot": "robot --outputdir robot-results tests/robot",
+    "test:robot:chrome": "BROWSER=chrome npm run test:robot",
+    "test:robot:firefox": "BROWSER=firefox npm run test:robot",
+    "test:robot:all": "npm run test:robot:chrome && npm run test:robot:firefox",
     "generate:resume": "node scripts/generate-resume-pdf.js"
   },
   "dependencies": {
-    "@astrojs/svelte": "^7.2.5",
-    "@tailwindcss/vite": "^4.1.18",
-    "astro": "^5.17.1",
-    "svelte": "^5.49.1",
-    "tailwindcss": "^4.1.18"
+    "@astrojs/svelte": "9.0.1",
+    "@tailwindcss/vite": "4.3.3",
+    "astro": "7.2.4",
+    "svelte": "5.56.9",
+    "tailwindcss": "4.3.3"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.6",
-    "@sentry/astro": "^10.38.0",
-    "@testing-library/dom": "^10.4.1",
-    "@testing-library/svelte": "^5.3.1",
-    "@vitest/coverage-v8": "^4.0.18",
-    "@vitest/ui": "^4.0.18",
-    "daisyui": "^5.5.16",
-    "happy-dom": "^20.4.0",
-    "jsdom": "^28.0.0",
-    "jsonresume-theme-even": "^0.26.1",
-    "jsonresume-theme-stackoverflow": "^2.1.0",
-    "puppeteer": "^24.36.1",
-    "resumed": "^6.1.0",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.18"
+    "@astrojs/check": "0.9.10",
+    "@sentry/astro": "10.70.0",
+    "@testing-library/dom": "10.4.1",
+    "@testing-library/svelte": "5.4.2",
+    "@vitest/coverage-v8": "4.1.11",
+    "@vitest/ui": "4.1.11",
+    "daisyui": "5.7.19",
+    "happy-dom": "20.11.6",
+    "jsdom": "30.0.1",
+    "jsonresume-theme-even": "0.26.1",
+    "jsonresume-theme-stackoverflow": "3.3.0",
+    "puppeteer": "25.8.0",
+    "resumed": "6.1.0",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11",
+    "wait-on": "^9.1.0"
+  },
+  "overrides": {
+    "vite": "8.1.5",
+    "rollup": "4.62.2"
   }
 }

@@ -1,0 +1,47 @@
+# Build outputs
+dist/
+.astro/
+
+# Dependencies
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.production.local
+.env.development.local
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+coverage/
+.nyc_output/
+robot-results/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Generated files
+public/resume.pdf
+
+# Local Netlify folder
+.netlify
+
+# Local tooling
+.opencode/

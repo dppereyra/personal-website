@@ -1,0 +1,2 @@
+# Redirect /resume-pdf to actual PDF file (200 = rewrite, keeps URL)
+/resume-pdf  /resume.pdf  200

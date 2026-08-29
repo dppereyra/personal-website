@@ -1,0 +1,84 @@
+---
+import '../styles/global.css';
+import Sidebar from '../components/Sidebar.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Personal website and blog' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" data-theme="fuwari">
+  <head>
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem('theme');
+          var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'fuwari-dark' : 'fuwari');
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {}
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+
+    {/* Google Analytics - Only loads if GA_MEASUREMENT_ID is set */}
+    {import.meta.env.PUBLIC_GA_MEASUREMENT_ID && (
+      <>
+        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${import.meta.env.PUBLIC_GA_MEASUREMENT_ID}`}></script>
+        <script is:inline define:vars={{ gaId: import.meta.env.PUBLIC_GA_MEASUREMENT_ID }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', gaId, {
+            anonymize_ip: true, // GDPR-friendly
+            cookie_flags: 'SameSite=None;Secure',
+          });
+        </script>
+      </>
+    )}
+  </head>
+  <body>
+    <div class="min-h-screen bg-base-100">
+      <nav class="site-navbar navbar max-w-6xl px-4">
+        <div class="flex-1">
+          <a href="/" class="btn btn-ghost text-xl">Chiff's Nook</a>
+        </div>
+        <div class="flex-none flex items-center gap-1">
+          <ul class="menu menu-horizontal px-1 flex-wrap">
+            <li><a href="/">Blog</a></li>
+            <li><a href="/work">Work</a></li>
+            <li><a href="/projects">Projects</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+          <ThemeToggle />
+        </div>
+      </nav>
+
+      <main class="max-w-6xl mx-auto px-4 py-8 lg:grid lg:grid-cols-[260px_1fr] lg:gap-8 lg:items-start">
+        <div class="lg:sticky lg:top-24 mb-8 lg:mb-0">
+          <Sidebar />
+        </div>
+        <div class="min-w-0">
+          <slot />
+        </div>
+      </main>
+
+      <footer class="footer footer-center p-10 bg-base-200 text-base-content mt-16">
+        <aside>
+          <p class="font-bold">www.dppereyra.com</p>
+          <p>Copyright © {new Date().getFullYear()} - All rights reserved</p>
+        </aside>
+      </footer>
+    </div>
+  </body>
+</html>
