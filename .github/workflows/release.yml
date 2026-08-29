@@ -1,0 +1,48 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - production
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Determine release tag
+        id: tag
+        run: |
+          date_tag="v$(date +%Y.%m.%d)"
+          if git rev-parse "$date_tag" >/dev/null 2>&1; then
+            n=2
+            while git rev-parse "${date_tag}-${n}" >/dev/null 2>&1; do
+              n=$((n + 1))
+            done
+            tag="${date_tag}-${n}"
+          else
+            tag="$date_tag"
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Create tag
+        run: |
+          git tag "${{ steps.tag.outputs.tag }}"
+          git push origin "${{ steps.tag.outputs.tag }}"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ steps.tag.outputs.tag }}" \
+            --target production \
+            --title "${{ steps.tag.outputs.tag }}" \
+            --generate-notes
