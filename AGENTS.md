@@ -63,15 +63,19 @@ src/
 ├── layouts/
 │   └── Layout.astro    # Main layout with navigation and footer
 ├── pages/
-│   ├── index.astro     # Blog listing (homepage)
+│   ├── index.astro     # Home (latest posts + latest decks)
+│   ├── rss.xml.js       # Combined RSS feed (posts + decks)
 │   ├── about.astro     # About page (pulls from resume.json)
 │   ├── contact.astro   # Contact page
 │   ├── work.astro      # Work history (from resume.json)
 │   ├── slides.astro    # Slide deck listing
 │   ├── blog/
-│   │   └── [...slug].astro  # Dynamic blog post pages
+│   │   ├── index.astro       # Blog listing
+│   │   ├── rss.xml.js         # Blog-only RSS feed
+│   │   └── [...slug].astro   # Dynamic blog post pages
 │   └── slides/
-│       └── [...slug].astro  # Dynamic slide deck pages
+│       ├── rss.xml.js         # Decks-only RSS feed
+│       └── [...slug].astro   # Dynamic slide deck pages
 ├── styles/
 │   ├── global.css      # Tailwind CSS imports and DaisyUI plugin
 │   └── marp-themes/    # Vendored Marp theme CSS (e.g. wave.css)
@@ -85,19 +89,27 @@ src/
 ## Architecture
 
 **Routing**: File-based routing in `src/pages/`
-- `index.astro` → `/` (blog listing)
+- `index.astro` → `/` (Home: latest posts + latest decks)
+- `rss.xml.js` → `/rss.xml` (combined RSS feed)
+- `blog/index.astro` → `/blog` (blog listing)
+- `blog/rss.xml.js` → `/blog/rss.xml` (blog-only RSS feed)
 - `about.astro` → `/about` (displays info from resume.json)
 - `work.astro` → `/work` (work history from resume.json)
 - `slides.astro` → `/slides` (slide deck listing)
+- `slides/rss.xml.js` → `/slides/rss.xml` (decks-only RSS feed)
 - `contact.astro` → `/contact`
 - `blog/[...slug].astro` → `/blog/{slug}` (dynamic routes)
 - `slides/[...slug].astro` → `/slides/{slug}` (dynamic routes)
+
+**Navigation**: nav tabs are, in order, Home (`/`), Blog (`/blog`), Decks (`/slides`), Work (`/work`), About (`/about`), Contact (`/contact`) — defined in `src/layouts/Layout.astro`. Keep this order when adding/removing tabs.
+
+**Home page**: `src/pages/index.astro` shows the `RECENT_ITEMS_LIMIT` (3) most recent blog posts and most recent decks side by side, each section linking through to its full listing (`/blog`, `/slides`)
 
 **Blog System**: Uses Astro Content Collections
 - Blog posts are markdown files in `src/content/blog/`
 - Schema defined in `src/content.config.ts`
 - Frontmatter fields: `title`, `description`, `pubDate`, `updatedDate`, `tags`
-- Posts are sorted by `pubDate` (newest first) on the homepage
+- Posts are sorted by `pubDate` (newest first) on `/blog`
 
 **Slide Deck System**: Separate Astro Content Collection, rendered with Marp (nav tab labeled "Decks")
 - Slide decks are markdown files in `src/content/slides/`, kept in their own folder rather than mixed into `blog/`
@@ -108,6 +120,13 @@ src/
 - Decks are sorted by `pubDate` (newest first) on `/slides`
 - **Download PDF**: `scripts/generate-slide-pdfs.js` renders each deck (reusing `renderSlides()`) into a standalone HTML document and prints it to PDF with Puppeteer (already a dependency for the resume PDF), one page per slide via `break-after: page`. Output goes to `public/slides/<slug>.pdf` (gitignored, like `public/resume.pdf`), wired into `npm run full-build` as `generate:slides`. The deck page links to it as a "Download PDF" button
 - **View Deck (presentation mode)**: a client-side `<script>` on the deck detail page clones the already-rendered `<svg data-marpit-svg>` slides one at a time into a fullscreen overlay (`position: fixed; inset: 0`), re-wrapped in a fresh `div.marpit` so the theme's `div.marpit > svg > foreignObject > section`-scoped CSS still applies to the clone. Also requests the Fullscreen API on a best-effort basis. Click / ArrowRight / Space advances, ArrowLeft goes back, Escape (or exiting fullscreen any other way) closes it
+
+**Syndication (RSS)**: three RSS 2.0 feeds, built with the official `@astrojs/rss` package (needs `astro.config.mjs`'s `site` option, already set)
+- `/rss.xml` — combined feed: latest posts and decks merged and sorted by `pubDate`, each item tagged with a `post`/`deck` category
+- `/blog/rss.xml` — blog posts only
+- `/slides/rss.xml` — decks only
+- All three are advertised via `<link rel="alternate" type="application/rss+xml">` in `Layout.astro`'s `<head>` (so browsers/readers auto-discover them on every page), plus a visible "RSS" button on the Home, Blog, and Decks listing pages linking to the matching feed
+- Atom was considered and intentionally skipped — RSS 2.0 alone covers virtually every feed reader; add an Atom variant only if a specific consumer actually requires it
 
 **Styling**: Tailwind CSS v4 with DaisyUI
 - Global styles in `src/styles/global.css`

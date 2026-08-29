@@ -27,6 +27,7 @@
     "generate:slides": "node scripts/generate-slide-pdfs.js"
   },
   "dependencies": {
+    "@astrojs/rss": "^4.0.19",
     "@astrojs/svelte": "9.0.1",
     "@tailwindcss/vite": "4.3.3",
     "astro": "7.2.4",

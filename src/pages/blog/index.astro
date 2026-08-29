@@ -1,38 +1,38 @@
 ---
 import { getCollection, type CollectionEntry } from 'astro:content';
-import Layout from '../layouts/Layout.astro';
-import { formatDate, sortByDate } from '../utils/formatDate';
+import Layout from '../../layouts/Layout.astro';
+import { formatDate, sortByDate } from '../../utils/formatDate';
 
-const allSlides = await getCollection('slides');
-const sortedSlides: CollectionEntry<'slides'>[] = sortByDate(allSlides);
+const allPosts = await getCollection('blog');
+const sortedPosts: CollectionEntry<'blog'>[] = sortByDate(allPosts);
 ---
 
-<Layout title="Decks - Chiff's Nook">
+<Layout title="Blog - Chiff's Nook">
   <div class="max-w-4xl mx-auto">
     <div class="flex items-center justify-between mb-8">
-      <h1 class="text-4xl font-bold">Decks</h1>
-      <a href="/slides/rss.xml" class="btn btn-outline btn-sm">RSS</a>
+      <h1 class="text-4xl font-bold">Blog</h1>
+      <a href="/blog/rss.xml" class="btn btn-outline btn-sm">RSS</a>
     </div>
 
     <div class="space-y-6">
-      {sortedSlides.map((deck) => (
+      {sortedPosts.map((post) => (
         <article class="card bg-base-200 shadow-xl">
           <div class="card-body">
             <h2 class="card-title text-2xl">
-              <a href={`/slides/${deck.id}`} class="hover:text-primary">
-                {deck.data.title}
+              <a href={`/blog/${post.id}`} class="hover:text-primary">
+                {post.data.title}
               </a>
             </h2>
             <p class="text-base-content/70">
-              {deck.data.description}
+              {post.data.description}
             </p>
             <div class="flex items-center gap-4 text-sm text-base-content/60">
-              <time datetime={deck.data.pubDate.toISOString()}>
-                {formatDate(deck.data.pubDate)}
+              <time datetime={post.data.pubDate.toISOString()}>
+                {formatDate(post.data.pubDate)}
               </time>
-              {deck.data.tags.length > 0 && (
+              {post.data.tags.length > 0 && (
                 <div class="flex gap-2">
-                  {deck.data.tags.map((tag: string) => (
+                  {post.data.tags.map((tag: string) => (
                     <span class="badge badge-sm">{tag}</span>
                   ))}
                 </div>
