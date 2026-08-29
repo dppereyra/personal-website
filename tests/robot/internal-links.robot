@@ -25,6 +25,6 @@ All Internal Clickable Destinations Should Not 404
   END
   List Should Contain Value    ${visited}    /about
   List Should Contain Value    ${visited}    /work
-  List Should Contain Value    ${visited}    /projects
+  List Should Contain Value    ${visited}    /slides
   List Should Contain Value    ${visited}    /contact
   List Should Contain Value    ${visited}    /resume.pdf

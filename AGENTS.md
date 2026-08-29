@@ -55,9 +55,10 @@ To start developing:
 
 ```
 src/
+├── content.config.ts   # Content collections schema (blog posts, slide decks)
 ├── content/
-│   ├── config.ts       # Content collections schema (blog posts)
-│   └── blog/           # Blog post markdown files
+│   ├── blog/            # Blog post markdown files
+│   └── slides/          # Marp slide deck markdown files
 ├── layouts/
 │   └── Layout.astro    # Main layout with navigation and footer
 ├── pages/
@@ -65,13 +66,18 @@ src/
 │   ├── about.astro     # About page (pulls from resume.json)
 │   ├── contact.astro   # Contact page
 │   ├── work.astro      # Work history (from resume.json)
-│   ├── projects.astro  # Project portfolio (from resume.json)
-│   └── blog/
-│       └── [...slug].astro  # Dynamic blog post pages
+│   ├── slides.astro    # Slide deck listing
+│   ├── blog/
+│   │   └── [...slug].astro  # Dynamic blog post pages
+│   └── slides/
+│       └── [...slug].astro  # Dynamic slide deck pages
 ├── styles/
-│   └── global.css      # Tailwind CSS imports and DaisyUI plugin
+│   ├── global.css      # Tailwind CSS imports and DaisyUI plugin
+│   └── marp-themes/    # Vendored Marp theme CSS (e.g. wave.css)
 ├── types/
 │   └── resume.ts       # JSON Resume schema TypeScript types
+├── utils/
+│   └── marp.ts          # Marp deck rendering helper (marp-core)
 └── resume.json         # JSON Resume data (update with your info)
 ```
 
@@ -81,15 +87,24 @@ src/
 - `index.astro` → `/` (blog listing)
 - `about.astro` → `/about` (displays info from resume.json)
 - `work.astro` → `/work` (work history from resume.json)
-- `projects.astro` → `/projects` (project portfolio from resume.json)
+- `slides.astro` → `/slides` (slide deck listing)
 - `contact.astro` → `/contact`
 - `blog/[...slug].astro` → `/blog/{slug}` (dynamic routes)
+- `slides/[...slug].astro` → `/slides/{slug}` (dynamic routes)
 
 **Blog System**: Uses Astro Content Collections
 - Blog posts are markdown files in `src/content/blog/`
-- Schema defined in `src/content/config.ts`
+- Schema defined in `src/content.config.ts`
 - Frontmatter fields: `title`, `description`, `pubDate`, `updatedDate`, `tags`
 - Posts are sorted by `pubDate` (newest first) on the homepage
+
+**Slide Deck System**: Separate Astro Content Collection, rendered with Marp
+- Slide decks are markdown files in `src/content/slides/`, kept in their own folder rather than mixed into `blog/`
+- Schema (same shape as blog posts) defined in `src/content.config.ts`
+- Frontmatter carries **both** the site's display metadata (`title`, `description`, `pubDate`, `updatedDate`, `tags`) and Marp's own directives (`marp: true`, `theme: wave`, `paginate: true`, etc.) in the same YAML block — Astro's schema ignores keys it doesn't recognize, and Marp ignores keys it doesn't recognize, so no splitting is needed
+- Rendering: `src/utils/marp.ts` uses `@marp-team/marp-core` to render a deck's raw markdown (read directly from disk via Node `fs`, not via the content collection's `.body`, since Astro strips frontmatter before exposing `.body` and Marp's own front-matter parser needs to see it) into HTML/CSS at build time. The HTML/CSS is injected inline into the page via Astro's `set:html` — no iframe, no separate static-HTML build step
+- Theme: [Wave](https://github.com/JuliusWiedemann/MarpThemeWave) (MIT), vendored at `src/styles/marp-themes/wave.css`
+- Decks are sorted by `pubDate` (newest first) on `/slides`
 
 **Styling**: Tailwind CSS v4 with DaisyUI
 - Global styles in `src/styles/global.css`
@@ -118,6 +133,34 @@ Your markdown content here...
 
 The post will automatically appear on the homepage and be accessible at `/blog/{filename}`.
 
+## Adding Slide Decks
+
+Create a new markdown file in `src/content/slides/`:
+
+```markdown
+---
+marp: true
+theme: wave
+paginate: true
+title: 'Deck Title'
+description: 'Brief description'
+pubDate: 2026-02-03
+tags: ['tag1', 'tag2']
+---
+
+# First Slide
+
+Content...
+
+---
+
+## Second Slide
+
+Content...
+```
+
+Slides are separated by `---` on its own line. The deck will automatically appear on `/slides` and be accessible at `/slides/{filename}`.
+
 ## JSON Resume Integration
 
 The site uses [JSON Resume](https://jsonresume.org/) schema for structured resume data.
@@ -129,7 +172,6 @@ The site uses [JSON Resume](https://jsonresume.org/) schema for structured resum
 **Pages Using Resume Data**:
 - `/about` - Displays basics, skills, interests, and social profiles
 - `/work` - Shows work history with positions, companies, dates, and highlights
-- `/projects` - Displays project portfolio with descriptions, technologies, and links
 
 **Updating Your Resume**:
 1. Edit `src/resume.json` with your information
