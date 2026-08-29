@@ -16,10 +16,10 @@ const sortedSlides: CollectionEntry<'slides'>[] = sortByDate(allSlides);
 
     <div class="space-y-6">
       {sortedSlides.map((deck) => (
-        <article class="card bg-base-200 shadow-xl">
+        <article class="card bg-base-200 shadow-xl relative">
           <div class="card-body">
             <h2 class="card-title text-2xl">
-              <a href={`/slides/${deck.id}`} class="hover:text-primary">
+              <a href={`/slides/${deck.id}`} class="hover:text-primary after:absolute after:inset-0">
                 {deck.data.title}
               </a>
             </h2>
