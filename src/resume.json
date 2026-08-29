@@ -1,6 +1,6 @@
 {
   "meta": {
-    "theme": "jsonresume-theme-stackoverflow"
+    "theme": "jsonresume-theme-kendall"
   },
   "basics": {
     "name": "Dennis Philippe T. Pereyra Jr.",
@@ -15,9 +15,9 @@
     },
     "profiles": [
       {
-        "network": "X",
+        "network": "Twitter",
         "username": "dptpereyra",
-        "url": "https://x.com/dptpereyra"
+        "url": "https://twitter.com/dptpereyra"
       },
       {
         "network": "LinkedIn",
@@ -27,7 +27,7 @@
       {
         "network": "GitHub",
         "username": "dppereyra",
-        "url": "https://github.com/dppereyra"
+        "url": "https://github.com/dennisphilippe-pereyra-cla"
       },
       {
         "network": "GitLab",
@@ -43,9 +43,23 @@
   },
   "work": [
     {
+      "name": "3Cloud",
+      "position": "Senior DevOps Engineer",
+      "startDate": "2025-03",
+      "highlights": [
+        "Setup and migrate from Gitpod to ONA ensuring 0 downtime from developer productivity",
+        "Support integration of Agentic AI in dev workflow increasing story completion in a sprint by 20%",
+        "Manage and maintain github action pipelines",
+        "Manage and maintain the Azure infrastructure",
+        "Automate deployments using github action",
+        "Help in setting up monitoring and alerting"
+      ]
+    },
+    {
       "name": "Simcorp",
       "position": "Senior DevOps Engineer",
       "startDate": "2024-08",
+      "endDate": "2025-01",
       "highlights": [
         "Integrate Snowflake data marketplace to product offering",
         "Help launch Qlik offering to production",
@@ -59,9 +73,9 @@
     },
     {
       "name": "Recruitics / Doxa",
-      "position": "Freelance - SRE",
+      "position": "Senior SRE",
       "startDate": "2024-02",
-      "endDate": "2024-08",
+      "endDate": "2024-07",
       "highlights": [
         "Manage and maintain the AWS infrastructure either via Jenkins, Bitbucket Pipelines, and/or ArgoCD",
         "Maintain software quality and security by ensuring all releases are checked by sonar and/or trivy",
@@ -124,7 +138,7 @@
       "endDate": "2019-05",
       "highlights": [
         "Migrate services from azure to gcp",
-        "Provide guidance/advice on database deisign/architecture as well as dockerizing applications"
+        "Provide guidance/advice on database design/architecture as well as dockerizing applications"
       ]
     },
     {
@@ -221,13 +235,15 @@
   "certificates": [{
     "name": "Licensed Electronics and Communications Engineer",
     "date": "2007-04",
-      "issuer": "Philippines Professional Regulation Commission"
+    "issuer": "Philippines Professional Regulation Commission"
   }],
   "skills": [
     {
       "name": "Software Development",
       "keywords": [
         "Python",
+        "Javascript",
+        "Typescript",
         "Git",
         "Microservices",
         "ReST",
@@ -238,10 +254,7 @@
       "name": "Databases",
       "keywords": [
         "PostgreSQL",
-        "MariaDB",
         "MySQL",
-        "Oracle",
-        "MS Access",
         "SQLite",
         "Redis",
         "Cassandra",
@@ -263,7 +276,8 @@
       "keywords": [
         "Terraform",
         "ARM / Bicep",
-        "CloudFormation"
+        "CloudFormation",
+        "Spacelift"
       ]
     },
     {
@@ -280,23 +294,16 @@
       "keywords": [
         "Argo",
         "Flux",
-        "Cert Manager",
-        "Prisma/Twistlock",
-        "Istio",
-        "Calico",
-        "Kiali"
+        "Istio"
       ]
     },
     {
       "name": "Monitoring",
       "keywords": [
-        "Prometheus",
-        "Grafana",
+        "Promstack",
         "ELK Stack",
-        "FluentD",
-        "Alertmanager",
         "Jaeger",
-        "PagerDuty",
+        "Dynatrace",
         "New Relic"
       ]
     },
@@ -305,11 +312,8 @@
       "keywords": [
         "Kubernetes",
         "Openshift",
-        "Nomad",
-        "AKS",
         "Docker",
-        "Packer",
-        "Consul"
+        "Packer"
       ]
     },
     {
@@ -318,10 +322,16 @@
         "RHEL",
         "Debian",
         "Ubuntu",
-        "Bash",
-        "Powershell",
         "Ansible",
         "Chef"
+      ]
+    },
+    {
+      "name": "Scripting",
+      "keywords": [
+        "Python",
+        "Bash",
+        "Powershell"
       ]
     },
     {
@@ -340,6 +350,15 @@
         "Kafka",
         "Azure Service Bus",
         "AWS SQS"
+      ]
+    },
+    {
+      "name": "AI/LLM/Agents",
+      "keywords": [
+        "Github Copilot",
+        "OpenAI Codex",
+        "Claude Code",
+        "Agents.md"
       ]
     }
   ],
