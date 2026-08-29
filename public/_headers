@@ -1,5 +1,42 @@
+# Site-wide security response headers for Netlify.
+#
+# public/ is Astro's static asset dir — everything in it is copied
+# byte-for-byte into the build output (dist/, per astro.config.mjs's
+# default publicDir/outDir and netlify.toml's `publish = "dist"`),
+# confirmed locally via `npm run build` (dist/_headers matches this file
+# exactly). Netlify reads _headers from the publish directory root and
+# applies the `/*` block to every response by default.
+#
+# CSP notes (see the security review that accompanies this file for the
+# full per-directive reasoning):
+#   - This is a fully static site (Astro `output: "static"`, no adapter,
+#     no per-request server) built once and served as prebuilt files, so
+#     there is no request-time hook to mint a fresh nonce. A nonce baked
+#     in at build time would be identical on every page load and would
+#     provide no real protection, so it is not used here.
+#   - script-src and style-src both need 'unsafe-inline': the theme
+#     bootstrap script, the GTM/GA bootstrap snippets (src/layouts/Layout.astro),
+#     and marp-core's rendered slide decks (inline <style> per deck, inline
+#     style="" attributes, and an inline <script> from
+#     @marp-team/marpit-svg-polyfill) all rely on it. The GTM/GA snippet
+#     content is interpolated with PUBLIC_GTM_ID/PUBLIC_GA_MEASUREMENT_ID at
+#     build time via Astro's define:vars, so it differs per environment and
+#     can't be pinned to a static sha256 hash in this non-templated file.
+#     Do NOT add a hash-source here without also adding 'unsafe-inline'
+#     removal awareness: CSP3 browsers drop 'unsafe-inline' entirely the
+#     moment *any* hash/nonce source is present on the same directive,
+#     which would silently break every unhashed inline script (GTM/GA) the
+#     next time this file is touched.
+#   - 'unsafe-eval' is deliberately NOT included — nothing in this build
+#     (Astro static output, Svelte islands compiled ahead of time) needs it.
+#   - img-src allows https://raw.githubusercontent.com: the vendored Marp
+#     Wave theme (src/styles/marp-themes/wave.css) loads its background
+#     wave graphic from there via a CSS background-image url(), which CSP
+#     governs under img-src, not style-src.
 /*
-  X-Frame-Options: SAMEORIGIN
   X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://www.gravatar.com https://raw.githubusercontent.com; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://*.sentry.io; frame-src 'self' https://www.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'
+  Strict-Transport-Security: max-age=63072000
+  Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), interest-cohort=(), browsing-topics=(), fullscreen=(self)
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://www.gravatar.com https://raw.githubusercontent.com https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io; frame-src 'self' https://*.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'

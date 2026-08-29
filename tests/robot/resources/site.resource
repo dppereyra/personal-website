@@ -75,6 +75,14 @@ Fetch Url
   ${response}=    Evaluate    __import__('urllib.request', fromlist=['request']).urlopen('''${url}''', timeout=15)
   RETURN    ${response}
 
+Get Response Header
+  [Documentation]    Returns the value of ${header_name} from a urllib response's
+  ...    headers (HTTP header lookup is case-insensitive), or an empty string if
+  ...    the header is absent from the response.
+  [Arguments]    ${response}    ${header_name}
+  ${value}=    Evaluate    $response.headers.get('''${header_name}''', '')
+  RETURN    ${value}
+
 Pdf Response Should Be Valid
   [Documentation]    Asserts an urllib response is a real, non-trivial PDF
   ...    document: HTTP 200, application/pdf content type, %PDF- magic bytes,
@@ -125,3 +133,69 @@ Close Presentation If Open
     Press Keys    None    ESCAPE
     Wait Until Element Is Not Visible    id:presentation-overlay    timeout=5 seconds
   END
+
+# --- Baseline security response headers -----------------------------------
+
+Response For A Requested Path Should Include Baseline Security Headers
+  [Documentation]    Fetches ${path} from ${BASE_URL} (independent of any
+  ...    browser session, like the deck detail PDF check) and asserts the
+  ...    response carries every baseline security header this site is
+  ...    expected to set on ${description}.
+  [Arguments]    ${path}    ${description}
+  ${response}=    Fetch Url    ${BASE_URL}${path}
+  Response Should Set X-Content-Type-Options To Nosniff    ${response}    ${description}
+  Response Should Set A Safe X-Frame-Options    ${response}    ${description}
+  Response Should Set A Sane Referrer-Policy    ${response}    ${description}
+  Response Should Set A Non-Trivial Content-Security-Policy    ${response}    ${description}
+
+Response Should Set X-Content-Type-Options To Nosniff
+  [Documentation]    Asserts the response's X-Content-Type-Options header is
+  ...    present and set to "nosniff" (case-insensitive). This stops browsers
+  ...    from MIME-sniffing a response away from its declared Content-Type,
+  ...    which is how a misdeclared upload can end up executed as script.
+  [Arguments]    ${response}    ${description}
+  ${value}=    Get Response Header    ${response}    X-Content-Type-Options
+  ${value_lower}=    Convert To Lower Case    ${value}
+  Should Be Equal As Strings    ${value_lower}    nosniff
+  ...    X-Content-Type-Options header missing or not "nosniff" on ${description} (got: "${value}")
+
+Response Should Set A Safe X-Frame-Options
+  [Documentation]    Asserts X-Frame-Options is present and set to DENY or
+  ...    SAMEORIGIN (case-insensitive), which stops the page being framed by
+  ...    an untrusted site (clickjacking).
+  [Arguments]    ${response}    ${description}
+  ${value}=    Get Response Header    ${response}    X-Frame-Options
+  ${value_upper}=    Convert To Upper Case    ${value}
+  ${allowed}=    Create List    DENY    SAMEORIGIN
+  List Should Contain Value    ${allowed}    ${value_upper}
+  ...    X-Frame-Options header missing or not DENY/SAMEORIGIN on ${description} (got: "${value}")
+
+Response Should Set A Sane Referrer-Policy
+  [Documentation]    Asserts Referrer-Policy is present and set to one of the
+  ...    spec-defined values that actually limit cross-origin referrer leakage
+  ...    (e.g. "strict-origin-when-cross-origin"). Rejects a missing header
+  ...    and rejects the permissive "unsafe-url" value, which leaks the full
+  ...    URL cross-origin and so is not a "sane" baseline choice.
+  [Arguments]    ${response}    ${description}
+  ${value}=    Get Response Header    ${response}    Referrer-Policy
+  ${value_lower}=    Convert To Lower Case    ${value}
+  ${allowed}=    Create List
+  ...    no-referrer    no-referrer-when-downgrade    origin
+  ...    origin-when-cross-origin    same-origin    strict-origin
+  ...    strict-origin-when-cross-origin
+  List Should Contain Value    ${allowed}    ${value_lower}
+  ...    Referrer-Policy header missing or not a sane value on ${description} (got: "${value}")
+
+Response Should Set A Non-Trivial Content-Security-Policy
+  [Documentation]    Asserts Content-Security-Policy is present and non-empty.
+  ...    Deliberately does not assert on specific directives — the CSP's exact
+  ...    design is owned elsewhere — this only guards against the header being
+  ...    absent or a trivial placeholder value.
+  [Arguments]    ${response}    ${description}
+  ${value}=    Get Response Header    ${response}    Content-Security-Policy
+  ${trimmed}=    Strip String    ${value}
+  Should Not Be Empty    ${trimmed}
+  ...    Content-Security-Policy header is missing or empty on ${description}
+  ${length}=    Get Length    ${trimmed}
+  Should Be True    ${length} >= 15
+  ...    Content-Security-Policy header looks like a placeholder rather than a real policy on ${description} (got: "${value}")

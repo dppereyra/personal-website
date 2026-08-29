@@ -19,10 +19,11 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
     "test:robot:install": "python3 -m venv .venv-robot && ./.venv-robot/bin/python -m pip install -r requirements-robot.txt",
-    "test:robot": "robot --outputdir robot-results tests/robot",
+    "test:robot": "robot --outputdir robot-results --exclude deployed-only tests/robot",
     "test:robot:chrome": "BROWSER=chrome npm run test:robot",
     "test:robot:firefox": "BROWSER=firefox npm run test:robot",
     "test:robot:all": "npm run test:robot:chrome && npm run test:robot:firefox",
+    "test:robot:deployed": "robot --outputdir robot-results --include deployed-only tests/robot",
     "generate:resume": "node scripts/generate-resume-pdf.js",
     "generate:slides": "node scripts/generate-slide-pdfs.js"
   },
