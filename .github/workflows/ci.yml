@@ -86,6 +86,12 @@ jobs:
       - name: Setup Firefox
         uses: browser-actions/setup-firefox@v1
 
+      - name: Generate resume PDF
+        run: npm run generate:resume
+
+      - name: Generate slide deck PDFs
+        run: npm run generate:slides
+
       - name: Build site
         run: npm run build:site
 

@@ -4,9 +4,11 @@ Library    SeleniumLibrary    timeout=10 seconds    run_on_failure=Capture Page 
 Library    String
 
 *** Variables ***
-${BASE_URL}             http://127.0.0.1:4321
+${BASE_URL}             %{BASE_URL=http://127.0.0.1:4321}
 ${BROWSER}              %{BROWSER=chrome}
 ${HEADLESS_ARG}         --headless=new
+${CHROME_BINARY}        %{CHROME_BINARY=}
+${FIREFOX_BINARY}       %{FIREFOX_BINARY=}
 
 *** Keywords ***
 Open Browser To Page
@@ -16,9 +18,15 @@ Open Browser To Page
     Call Method    ${options}    add_argument    ${HEADLESS_ARG}
     Call Method    ${options}    add_argument    --no-sandbox
     Call Method    ${options}    add_argument    --disable-dev-shm-usage
+    IF    '${CHROME_BINARY}' != ''
+      Evaluate    setattr($options, 'binary_location', r'''${CHROME_BINARY}''')
+    END
     Create Webdriver    Chrome    options=${options}
   ELSE
     Call Method    ${options}    add_argument    --headless
+    IF    '${FIREFOX_BINARY}' != ''
+      Evaluate    setattr($options, 'binary_location', r'''${FIREFOX_BINARY}''')
+    END
     Create Webdriver    Firefox    options=${options}
   END
   Set Selenium Speed    0 seconds
