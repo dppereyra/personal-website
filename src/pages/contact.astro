@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import type { Resume } from '../types/resume';
 import resumeData from '../resume.json';
 import SocialIcon from '../components/SocialIcon.astro';
+import { CALENDLY_MEETING_URL } from '../consts';
 
 const resume = resumeData as Resume;
 const basics = resume.basics || {};
@@ -98,6 +99,21 @@ const profiles = (basics.profiles || []).filter(
           <h2 class="card-title text-2xl mb-4">Other Ways to Connect</h2>
 
           <div class="space-y-4">
+            <div>
+              <h3 class="font-semibold mb-2">Meetings</h3>
+              <p class="text-base-content/70">
+                Prefer to talk it through? Book a 30-minute slot on my calendar:
+              </p>
+              <a
+                href={CALENDLY_MEETING_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn btn-primary mt-2"
+              >
+                Schedule a Meeting
+              </a>
+            </div>
+
             <div>
               <h3 class="font-semibold mb-2">Social Media</h3>
               <div class="flex flex-wrap gap-3">
