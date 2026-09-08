@@ -1,0 +1,70 @@
+# Test-only image. This does NOT build or deploy the site: Netlify builds from
+# netlify.toml, and CI builds on GitHub-hosted runners. Nothing in the delivery
+# path reads this file.
+#
+# Purpose: reproduce the deployment platform — x86-64 Linux, glibc, Node 24 —
+# from an arm64 macOS workstation, so platform-sensitive behaviour can be
+# exercised the way CI and Netlify actually see it. Specifically:
+#   - native optional dependencies, whose lockfile entries are selected by
+#     cpu/os/libc and therefore resolve differently on arm64 macOS
+#   - the puppeteer/Chrome PDF pipeline behind generate:resume and
+#     generate:slides
+#   - npm's lockfile resolution, including peer-dependency conflicts
+#
+# Build, then run the full verification:
+#   docker build --platform linux/amd64 -f Dockerfile.test -t personal-website-test .
+#   docker run --rm personal-website-test
+#
+# Run a single command instead of the default suite:
+#   docker run --rm personal-website-test npm test
+
+FROM --platform=linux/amd64 node:24-bookworm
+
+# Chrome's runtime shared libraries. Puppeteer downloads the browser binary
+# itself (see scripts/generate-resume-pdf.js), but the base image does not
+# carry the libraries that binary links against.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      ca-certificates \
+      fonts-liberation \
+      libasound2 \
+      libatk-bridge2.0-0 \
+      libatk1.0-0 \
+      libcairo2 \
+      libcups2 \
+      libdbus-1-3 \
+      libdrm2 \
+      libexpat1 \
+      libgbm1 \
+      libglib2.0-0 \
+      libgtk-3-0 \
+      libnspr4 \
+      libnss3 \
+      libpango-1.0-0 \
+      libx11-6 \
+      libxcb1 \
+      libxcomposite1 \
+      libxdamage1 \
+      libxext6 \
+      libxfixes3 \
+      libxkbcommon0 \
+      libxrandr2 \
+      xdg-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Install from the lockfile before copying source, so this layer caches
+# independently of source edits.
+#
+# Plain `npm ci` with no flags, matching CI: a lockfile that only resolves
+# with --legacy-peer-deps fails the image build here rather than passing
+# quietly and surfacing later on someone's clean clone.
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .
+
+# Everything CI runs, plus the two puppeteer PDF paths. Robot Framework's
+# browser suite is deliberately excluded — it needs a served site and is
+# covered by CI.
+CMD ["sh", "-c", "npm test && npm run generate:resume && npm run generate:slides && npm run build:site"]

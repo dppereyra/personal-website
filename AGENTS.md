@@ -39,6 +39,58 @@ npm run generate:slides  # Generate a downloadable PDF for each slide deck
 - Avoid changing generated artifacts unless the task specifically requires it.
 - Keep this file as the single source of truth for repository-specific agent guidance.
 
+## Target Platform
+
+**Assume x86-64 (linux/amd64) for this project.** CI runs on GitHub-hosted
+Linux runners and Netlify builds on Linux, both x86-64 with glibc — that is
+the platform the site is actually built and deployed on, so it is the one
+that decides correctness.
+
+Local workstations may be arm64 macOS. Where the two disagree, x86-64 Linux
+wins; verify there before concluding something is broken or fixed.
+
+Two places this matters in practice:
+
+- **The lockfile's native optional dependencies.** Entries such as
+  `@astrojs/compiler-binding-*` are selected by `cpu`, `os`, and `libc`.
+  Note `libc` (`glibc` vs `musl`) is independent of CPU architecture: both
+  `linux-x64-gnu` and `linux-x64-musl` are x86-64.
+
+  **Regenerate the lockfile inside `Dockerfile.test`, not on a macOS host.**
+  Observed: regenerating on arm64 macOS with npm 11.16.0 strips the `libc`
+  field from all 38 entries that carry it, while regenerating inside the
+  x86-64 image with npm 11.19.0 preserves all 38. The committed lockfile
+  matches the x86-64 result, which is the one that governs CI and Netlify.
+  A diff that drops `libc` fields is therefore a host artifact to discard,
+  not a legitimate change to commit.
+- **The puppeteer/Chrome PDF pipeline** (`generate:resume`, `generate:slides`)
+  produces platform-dependent output. PDFs built on macOS differ in size from
+  the Linux-built ones Netlify serves, through font subsetting alone — so
+  compare like with like, or compare on x86-64.
+
+Use `Dockerfile.test` to get that platform locally (see below).
+
+## Testing on the target platform
+
+`Dockerfile.test` is a **test-only** image reproducing the deployment platform
+(x86-64 Linux, glibc, Node 24). It is not part of the build or deploy path:
+Netlify builds from `netlify.toml` and CI builds on its own runners, so
+nothing in delivery reads it.
+
+```bash
+docker build --platform linux/amd64 -f Dockerfile.test -t personal-website-test .
+docker run --rm personal-website-test              # unit tests, both PDF paths, build
+docker run --rm personal-website-test npm test     # or a single command
+```
+
+It installs with a plain `npm ci` and no flags, matching CI — so a lockfile
+that only resolves with `--legacy-peer-deps` fails the image build rather than
+passing quietly and breaking someone's clean clone later.
+
+Reach for it when a change touches dependency resolution, native optional
+dependencies, or PDF generation. Ordinary source edits are still fine to
+verify with `npm test` and `npm run build:site` on the host.
+
 ## Development Environment
 
 Uses VS Code Dev Containers with:
