@@ -375,3 +375,5 @@ Configured for Netlify deployment via netlify-cli. The site is configured for ww
 11. Merge to `production`
 
 Steps 6–8 and 10 are real verification gates, not formalities — confirm the actual behavior (build a fresh local build, curl the live headers/feeds, drive a real browser) rather than trusting a report at face value. Production only ever gets touched via step 9–11, and only once staging is actually confirmed good, not just "PR opened."
+
+**Checking deploy readiness by polling headers**: the `*.netlify.app` URLs (deploy previews, `staging`/`production` branch subdomains) are served directly by Netlify and return an `etag` header. `www.dppereyra.com` is fronted by Cloudflare in front of Netlify and does not return `etag` — a `curl` loop polling for that header on the apex domain will hang forever. Poll `cache-status`/`age` or the Netlify API's deploy `state` instead when checking the live production domain specifically.
