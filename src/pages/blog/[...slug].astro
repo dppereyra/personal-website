@@ -16,6 +16,11 @@ const { Content } = await render(post);
 ---
 
 <Layout title={post.data.title} description={post.data.description}>
+  {post.data['ai-assisted'] && (
+    <aside class="ai-assisted-badge" aria-label="Disclosure">
+      This post is AI-assisted
+    </aside>
+  )}
   <article class="max-w-3xl mx-auto">
     <header class="mb-8">
       <a href="/blog" class="btn btn-ghost btn-sm mb-4">← Back to Blog</a>

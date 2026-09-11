@@ -199,3 +199,67 @@ Response Should Set A Non-Trivial Content-Security-Policy
   ${length}=    Get Length    ${trimmed}
   Should Be True    ${length} >= 15
   ...    Content-Security-Policy header looks like a placeholder rather than a real policy on ${description} (got: "${value}")
+
+# --- AI-assisted disclosure ----------------------------------------------
+
+Given A Visitor Opens The AI Assisted Post
+  [Documentation]    Opens the blog post that sets `ai-assisted: true` in its
+  ...    front matter.
+  Go To    ${BASE_URL}/blog/marking-ai-assisted-content
+  Wait Until Page Contains Element    css:article    timeout=10 seconds
+
+Given A Visitor Opens An Unmarked Post
+  [Documentation]    Opens a blog post that does not set `ai-assisted`, to prove
+  ...    the badge is opt-in rather than always-on.
+  Go To    ${BASE_URL}/blog/welcome
+  Wait Until Page Contains Element    css:article    timeout=10 seconds
+
+Given A Visitor Opens The AI Assisted Deck
+  Go To    ${BASE_URL}/slides/marking-ai-assisted-content
+  Wait Until Page Contains Element    id:marp-deck    timeout=10 seconds
+
+Then The AI Assisted Badge Should Be Visible
+  Wait Until Element Is Visible    css:.ai-assisted-badge    timeout=10 seconds
+  ${text}=    Get Text    css:.ai-assisted-badge
+  Should Contain    ${text}    AI-assisted
+  ...    The disclosure badge rendered but did not say it was AI-assisted
+
+Then The AI Assisted Badge Should Not Exist
+  Page Should Not Contain Element    css:.ai-assisted-badge
+
+Get Badge Viewport Position
+  [Documentation]    Returns the badge's position relative to the viewport (not
+  ...    the document), which is what decides whether a fixed element has stayed
+  ...    put while the page scrolled underneath it.
+  ${rect}=    Execute Javascript
+  ...    const r = document.querySelector('.ai-assisted-badge').getBoundingClientRect(); return [Math.round(r.top), Math.round(r.right)];
+  RETURN    ${rect}
+
+When They Scroll To The Bottom Of The Post
+  Execute Javascript    window.scrollTo(0, document.body.scrollHeight);
+  Sleep    0.4s
+
+Then The Page Should Have Actually Scrolled
+  [Documentation]    Guards the scroll test: if the post were too short to
+  ...    scroll, the "badge stayed put" assertion would pass trivially.
+  ${offset}=    Execute Javascript    return Math.round(window.scrollY);
+  Should Be True    ${offset} > 0
+  ...    The page did not scroll, so the fixed-position assertion proves nothing
+
+Then The Badge Should Sit In The Top Right Of The Viewport
+  ${rect}=    Get Badge Viewport Position
+  ${viewport_width}=    Execute Javascript    return Math.round(window.innerWidth);
+  Should Be True    ${rect}[0] >= 0 and ${rect}[0] < 200
+  ...    Badge is not near the top of the viewport (top=${rect}[0])
+  Should Be True    ${rect}[1] > ${viewport_width} / 2
+  ...    Badge is not in the right half of the viewport (right=${rect}[1])
+
+Count Slides Showing The AI Assisted Footer
+  [Documentation]    Counts rendered slides carrying the theme's .ai-assisted
+  ...    class, which is what draws the bottom-right disclosure footer.
+  ${count}=    Get Element Count    css:#marp-deck section.ai-assisted
+  RETURN    ${count}
+
+Count Slides In Deck
+  ${count}=    Get Element Count    css:#marp-deck section
+  RETURN    ${count}
