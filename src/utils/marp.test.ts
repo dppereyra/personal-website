@@ -107,3 +107,28 @@ describe('renderSlides ai-assisted marker', () => {
     expect(css).toContain('ai-assisted');
   });
 });
+
+describe('wave theme ai-assisted footer rule', () => {
+  it('ships a rule that actually draws the footer, not just the class hook', () => {
+    const { css } = renderSlides(aiAssistedFixture);
+    const rule = css.match(/section\.ai-assisted::before\s*\{([^}]*)\}/);
+    expect(rule, 'wave.css no longer defines a section.ai-assisted::before rule').not.toBeNull();
+    expect(rule![1]).toContain('AI-assisted (deck)');
+  });
+
+  it('positions the footer clear of the bottom of the slide', () => {
+    const { css } = renderSlides(aiAssistedFixture);
+    const rule = css.match(/section\.ai-assisted::before\s*\{([^}]*)\}/)![1];
+    const bottom = Number(rule.match(/bottom:\s*([\d.]+)px/)?.[1]);
+    // The page number occupies roughly 21px-45px from the bottom edge, so the
+    // disclosure has to start above that band. The authoritative check is the
+    // computed-style assertion in tests/robot/ai-assisted.robot; this keeps a
+    // regression from reaching the browser suite in the first place.
+    expect(bottom).toBeGreaterThanOrEqual(45);
+  });
+
+  it('drops the footer to the baseline when a slide has no page number', () => {
+    const { css } = renderSlides(aiAssistedFixture);
+    expect(css).toMatch(/section\.ai-assisted:not\(\[data-marpit-pagination\]\)::before/);
+  });
+});

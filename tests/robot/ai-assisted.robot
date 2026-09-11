@@ -53,3 +53,51 @@ An Unmarked Deck Shows No Disclosure Footer
   ${marked}=    Count Slides Showing The AI Assisted Footer
   Should Be Equal As Integers    ${marked}    0
   ...    An unmarked deck rendered the AI-assisted disclosure on ${marked} slide(s)
+  ${style}=    Get Deck Disclosure Computed Style
+  Should Be Equal    ${style}[content]    none
+  ...    An unmarked deck still drew a ::before footer: ${style}[content]
+
+A Marked Deck Actually Draws The Footer, Not Just The Class
+  [Documentation]    The class landing on every section proves the renderer did
+  ...    its job; it says nothing about whether the theme draws anything. This
+  ...    asserts the rendered text, so deleting the wave.css rule fails here
+  ...    rather than shipping an invisible disclosure.
+  Given A Visitor Opens The AI Assisted Deck
+  ${style}=    Get Deck Disclosure Computed Style
+  Should Contain    ${style}[content]    AI-assisted
+  ...    The theme drew no disclosure footer (::before content was ${style}[content])
+
+The Disclosure Footer Clears The Page Number
+  [Documentation]    Regression guard for a real collision: the page number
+  ...    resolves to the same bottom-right slot, so a footer sharing that line
+  ...    overlaps it. Compares the two computed boxes rather than eyeballing a
+  ...    screenshot.
+  Given A Visitor Opens The AI Assisted Deck
+  ${style}=    Get Deck Disclosure Computed Style
+  Should Not Be Equal    ${style}[pagContent]    none
+  ...    No page number rendered, so this test cannot prove the footer clears it
+  Should Be True    ${style}[discBottom] >= ${style}[pagTop]
+  ...    Disclosure footer overlaps the page number: footer starts ${style}[discBottom]px from the bottom but the page number reaches ${style}[pagTop]px
+
+The Disclosure Badge Stops Floating On Narrow Screens
+  [Documentation]    A fixed badge would sit on top of the article text on a
+  ...    phone, so below 640px it returns to normal page flow.
+  [Teardown]    Restore Desktop Viewport
+  Given A Visitor Opens The AI Assisted Post
+  ${desktop}=    Get Badge Computed Style
+  Should Be Equal    ${desktop}[position]    fixed
+  ...    Badge was not floating at desktop width (${desktop}[width]px)
+  When The Viewport Is Phone Sized
+  ${phone}=    Get Badge Computed Style
+  Should Be Equal    ${phone}[position]    static
+  ...    Badge still floats at ${phone}[width]px, where it would cover the article
+
+The Disclosure Badge Never Covers The Navbar
+  [Documentation]    The badge is fixed near the top of the viewport, where the
+  ...    sticky navbar also lives, so its stacking order has to stay underneath.
+  Given A Visitor Opens The AI Assisted Post
+  ${style}=    Get Badge Computed Style
+  ${badge_z}=    Convert To Integer    ${style}[zIndex]
+  ${nav_z}=    Convert To Integer    ${style}[navZIndex]
+  Should Be True    ${badge_z} < ${nav_z}
+  ...    Badge z-index ${badge_z} is not below the navbar's ${nav_z}

@@ -263,3 +263,28 @@ Count Slides Showing The AI Assisted Footer
 Count Slides In Deck
   ${count}=    Get Element Count    css:#marp-deck section
   RETURN    ${count}
+
+Get Deck Disclosure Computed Style
+  [Documentation]    Returns the computed ::before box the theme actually draws
+  ...    on the first slide, alongside the ::after page-number box. Asserting on
+  ...    computed style rather than the presence of the .ai-assisted class is
+  ...    what catches the theme rule being removed or repositioned — the class
+  ...    can be perfectly correct while nothing is visible.
+  ${data}=    Execute Javascript
+  ...    const s=document.querySelector('#marp-deck section'); const b=getComputedStyle(s,'::before'); const a=getComputedStyle(s,'::after'); const px=v=>parseFloat(v)||0; const bl=px(b.lineHeight)||px(b.fontSize)*1.5; const al=px(a.lineHeight)||px(a.fontSize)*1.5; return {content:b.content, discBottom:px(b.bottom), discTop:px(b.bottom)+bl, pagContent:a.content, pagBottom:px(a.bottom), pagTop:px(a.bottom)+al};
+  RETURN    ${data}
+
+Get Badge Computed Style
+  ${data}=    Execute Javascript
+  ...    const e=document.querySelector('.ai-assisted-badge'); const n=document.querySelector('nav.site-navbar'); const c=getComputedStyle(e); return {position:c.position, zIndex:c.zIndex, navZIndex:getComputedStyle(n).zIndex, width:Math.round(window.innerWidth)};
+  RETURN    ${data}
+
+When The Viewport Is Phone Sized
+  [Documentation]    640px is the breakpoint below which the badge stops
+  ...    floating; 400px is a realistic phone width well inside it.
+  Set Window Size    400    900
+  Sleep    0.4s
+
+Restore Desktop Viewport
+  Set Window Size    1280    900
+  Sleep    0.4s
