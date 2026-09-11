@@ -120,6 +120,62 @@ body {
   transform: translateY(-2px);
 }
 
+/*
+ * AI-assisted disclosure badge for blog posts.
+ *
+ * Driven by `ai-assisted: true` in the post's front matter. Fixed to the
+ * viewport so it stays in the top-right corner as the reader scrolls.
+ * `top` clears the sticky navbar (which sits at top:0.75rem, z-index 40), and
+ * the z-index stays below it so the badge never covers the nav.
+ */
+.ai-assisted-badge {
+  position: fixed;
+  top: 5.5rem;
+  right: 1.5rem;
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--color-base-content);
+  background-color: color-mix(in oklch, var(--color-base-100) 85%, transparent);
+  border: 1px solid color-mix(in oklch, var(--color-base-content) 12%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 1px 3px oklch(0% 0 0 / 0.06), 0 1px 2px oklch(0% 0 0 / 0.08);
+  pointer-events: none;
+}
+
+.ai-assisted-badge::before {
+  content: '';
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 9999px;
+  background-color: var(--color-accent);
+  flex: none;
+}
+
+/* On narrow screens the fixed badge would sit on top of the article text, so
+   it drops to the flow of the page instead of floating over it. */
+@media (max-width: 640px) {
+  .ai-assisted-badge {
+    position: static;
+    margin-bottom: 1rem;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .ai-assisted-badge {
+    background-color: var(--color-base-100);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
 /* Theme toggle: swap sun/moon icon based on active theme */
 #icon-moon {
   display: none;

@@ -199,3 +199,92 @@ Response Should Set A Non-Trivial Content-Security-Policy
   ${length}=    Get Length    ${trimmed}
   Should Be True    ${length} >= 15
   ...    Content-Security-Policy header looks like a placeholder rather than a real policy on ${description} (got: "${value}")
+
+# --- AI-assisted disclosure ----------------------------------------------
+
+Given A Visitor Opens The AI Assisted Post
+  [Documentation]    Opens the blog post that sets `ai-assisted: true` in its
+  ...    front matter.
+  Go To    ${BASE_URL}/blog/marking-ai-assisted-content
+  Wait Until Page Contains Element    css:article    timeout=10 seconds
+
+Given A Visitor Opens An Unmarked Post
+  [Documentation]    Opens a blog post that does not set `ai-assisted`, to prove
+  ...    the badge is opt-in rather than always-on.
+  Go To    ${BASE_URL}/blog/welcome
+  Wait Until Page Contains Element    css:article    timeout=10 seconds
+
+Given A Visitor Opens The AI Assisted Deck
+  Go To    ${BASE_URL}/slides/marking-ai-assisted-content
+  Wait Until Page Contains Element    id:marp-deck    timeout=10 seconds
+
+Then The AI Assisted Badge Should Be Visible
+  Wait Until Element Is Visible    css:.ai-assisted-badge    timeout=10 seconds
+  ${text}=    Get Text    css:.ai-assisted-badge
+  Should Contain    ${text}    AI-assisted
+  ...    The disclosure badge rendered but did not say it was AI-assisted
+
+Then The AI Assisted Badge Should Not Exist
+  Page Should Not Contain Element    css:.ai-assisted-badge
+
+Get Badge Viewport Position
+  [Documentation]    Returns the badge's position relative to the viewport (not
+  ...    the document), which is what decides whether a fixed element has stayed
+  ...    put while the page scrolled underneath it.
+  ${rect}=    Execute Javascript
+  ...    const r = document.querySelector('.ai-assisted-badge').getBoundingClientRect(); return [Math.round(r.top), Math.round(r.right)];
+  RETURN    ${rect}
+
+When They Scroll To The Bottom Of The Post
+  Execute Javascript    window.scrollTo(0, document.body.scrollHeight);
+  Sleep    0.4s
+
+Then The Page Should Have Actually Scrolled
+  [Documentation]    Guards the scroll test: if the post were too short to
+  ...    scroll, the "badge stayed put" assertion would pass trivially.
+  ${offset}=    Execute Javascript    return Math.round(window.scrollY);
+  Should Be True    ${offset} > 0
+  ...    The page did not scroll, so the fixed-position assertion proves nothing
+
+Then The Badge Should Sit In The Top Right Of The Viewport
+  ${rect}=    Get Badge Viewport Position
+  ${viewport_width}=    Execute Javascript    return Math.round(window.innerWidth);
+  Should Be True    ${rect}[0] >= 0 and ${rect}[0] < 200
+  ...    Badge is not near the top of the viewport (top=${rect}[0])
+  Should Be True    ${rect}[1] > ${viewport_width} / 2
+  ...    Badge is not in the right half of the viewport (right=${rect}[1])
+
+Count Slides Showing The AI Assisted Footer
+  [Documentation]    Counts rendered slides carrying the theme's .ai-assisted
+  ...    class, which is what draws the bottom-right disclosure footer.
+  ${count}=    Get Element Count    css:#marp-deck section.ai-assisted
+  RETURN    ${count}
+
+Count Slides In Deck
+  ${count}=    Get Element Count    css:#marp-deck section
+  RETURN    ${count}
+
+Get Deck Disclosure Computed Style
+  [Documentation]    Returns the computed ::before box the theme actually draws
+  ...    on the first slide, alongside the ::after page-number box. Asserting on
+  ...    computed style rather than the presence of the .ai-assisted class is
+  ...    what catches the theme rule being removed or repositioned — the class
+  ...    can be perfectly correct while nothing is visible.
+  ${data}=    Execute Javascript
+  ...    const s=document.querySelector('#marp-deck section'); const b=getComputedStyle(s,'::before'); const a=getComputedStyle(s,'::after'); const px=v=>parseFloat(v)||0; const bl=px(b.lineHeight)||px(b.fontSize)*1.5; const al=px(a.lineHeight)||px(a.fontSize)*1.5; return {content:b.content, discBottom:px(b.bottom), discTop:px(b.bottom)+bl, pagContent:a.content, pagBottom:px(a.bottom), pagTop:px(a.bottom)+al};
+  RETURN    ${data}
+
+Get Badge Computed Style
+  ${data}=    Execute Javascript
+  ...    const e=document.querySelector('.ai-assisted-badge'); const n=document.querySelector('nav.site-navbar'); const c=getComputedStyle(e); return {position:c.position, zIndex:c.zIndex, navZIndex:getComputedStyle(n).zIndex, width:Math.round(window.innerWidth)};
+  RETURN    ${data}
+
+When The Viewport Is Phone Sized
+  [Documentation]    640px is the breakpoint below which the badge stops
+  ...    floating; 400px is a realistic phone width well inside it.
+  Set Window Size    400    900
+  Sleep    0.4s
+
+Restore Desktop Viewport
+  Set Window Size    1280    900
+  Sleep    0.4s
