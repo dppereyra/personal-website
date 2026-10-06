@@ -199,3 +199,144 @@ Response Should Set A Non-Trivial Content-Security-Policy
   ${length}=    Get Length    ${trimmed}
   Should Be True    ${length} >= 15
   ...    Content-Security-Policy header looks like a placeholder rather than a real policy on ${description} (got: "${value}")
+
+# --- AI-assisted disclosure ----------------------------------------------
+
+Given A Visitor Opens The AI Assisted Post
+  [Documentation]    Opens the blog post that sets `ai-assisted: true` in its
+  ...    front matter.
+  Go To    ${BASE_URL}/blog/marking-ai-assisted-content
+  Wait Until Page Contains Element    css:article    timeout=10 seconds
+
+Given A Visitor Opens An Unmarked Post
+  [Documentation]    Opens a blog post that does not set `ai-assisted`, to prove
+  ...    the badge is opt-in rather than always-on.
+  Go To    ${BASE_URL}/blog/welcome
+  Wait Until Page Contains Element    css:article    timeout=10 seconds
+
+Given A Visitor Opens The AI Assisted Deck
+  Go To    ${BASE_URL}/slides/marking-ai-assisted-content
+  Wait Until Page Contains Element    id:marp-deck    timeout=10 seconds
+
+Then The AI Assisted Badge Should Be Visible
+  Wait Until Element Is Visible    css:.ai-assisted-badge    timeout=10 seconds
+  ${text}=    Get Text    css:.ai-assisted-badge
+  Should Contain    ${text}    AI-assisted
+  ...    The disclosure badge rendered but did not say it was AI-assisted
+
+Then The AI Assisted Badge Should Not Exist
+  Page Should Not Contain Element    css:.ai-assisted-badge
+
+Get Badge Viewport Position
+  [Documentation]    Returns the badge's position relative to the viewport (not
+  ...    the document), which is what decides whether a fixed element has stayed
+  ...    put while the page scrolled underneath it.
+  ${rect}=    Execute Javascript
+  ...    const r = document.querySelector('.ai-assisted-badge').getBoundingClientRect(); return [Math.round(r.top), Math.round(r.right)];
+  RETURN    ${rect}
+
+When They Scroll To The Bottom Of The Post
+  Execute Javascript    window.scrollTo(0, document.body.scrollHeight);
+  Sleep    0.4s
+
+Then The Page Should Have Actually Scrolled
+  [Documentation]    Guards the scroll test: if the post were too short to
+  ...    scroll, the "badge stayed put" assertion would pass trivially.
+  ${offset}=    Execute Javascript    return Math.round(window.scrollY);
+  Should Be True    ${offset} > 0
+  ...    The page did not scroll, so the fixed-position assertion proves nothing
+
+Then The Badge Should Sit In The Top Right Of The Viewport
+  ${rect}=    Get Badge Viewport Position
+  ${viewport_width}=    Execute Javascript    return Math.round(window.innerWidth);
+  Should Be True    ${rect}[0] >= 0 and ${rect}[0] < 200
+  ...    Badge is not near the top of the viewport (top=${rect}[0])
+  Should Be True    ${rect}[1] > ${viewport_width} / 2
+  ...    Badge is not in the right half of the viewport (right=${rect}[1])
+
+Count Slides Showing The AI Assisted Footer
+  [Documentation]    Counts rendered slides carrying the theme's .ai-assisted
+  ...    class, which is what draws the bottom-right disclosure footer.
+  ${count}=    Get Element Count    css:#marp-deck section.ai-assisted
+  RETURN    ${count}
+
+Count Slides In Deck
+  ${count}=    Get Element Count    css:#marp-deck section
+  RETURN    ${count}
+
+Get Deck Disclosure Computed Style
+  [Documentation]    Returns the computed ::before box the theme actually draws
+  ...    on the first slide, alongside the ::after page-number box. Asserting on
+  ...    computed style rather than the presence of the .ai-assisted class is
+  ...    what catches the theme rule being removed or repositioned — the class
+  ...    can be perfectly correct while nothing is visible.
+  ${data}=    Execute Javascript
+  ...    const s=document.querySelector('#marp-deck section'); const b=getComputedStyle(s,'::before'); const a=getComputedStyle(s,'::after'); const px=v=>parseFloat(v)||0; const bl=px(b.lineHeight)||px(b.fontSize)*1.5; const al=px(a.lineHeight)||px(a.fontSize)*1.5; return {content:b.content, discBottom:px(b.bottom), discTop:px(b.bottom)+bl, pagContent:a.content, pagBottom:px(a.bottom), pagTop:px(a.bottom)+al};
+  RETURN    ${data}
+
+Get Badge Computed Style
+  ${data}=    Execute Javascript
+  ...    const e=document.querySelector('.ai-assisted-badge'); const n=document.querySelector('nav.site-navbar'); const c=getComputedStyle(e); return {position:c.position, zIndex:c.zIndex, navZIndex:getComputedStyle(n).zIndex, width:Math.round(window.innerWidth)};
+  RETURN    ${data}
+
+When The Viewport Is Phone Sized
+  [Documentation]    640px is the breakpoint below which the badge stops
+  ...    floating; 400px is a realistic phone width well inside it.
+  Set Window Size    400    900
+  Sleep    0.4s
+
+Restore Desktop Viewport
+  Set Window Size    1280    900
+  Sleep    0.4s
+
+# --- HTTP helpers ------------------------------------------------------------
+
+Read Response Text
+  [Documentation]    Returns a urllib response's body decoded as UTF-8.
+  [Arguments]    ${response}
+  ${body}=    Call Method    ${response}    read
+  ${text}=    Evaluate    $body.decode('utf-8')
+  RETURN    ${text}
+
+Get Url Status
+  [Documentation]    Returns the HTTP status code for ${url}, including error
+  ...    statuses that urllib raises as exceptions rather than returning.
+  [Arguments]    ${url}
+  TRY
+    ${response}=    Fetch Url    ${url}
+    ${status}=    Call Method    ${response}    getcode
+  EXCEPT    *HTTP Error *    type=GLOB    AS    ${error}
+    ${status}=    Evaluate    int(re.search(r'HTTP Error (\\d+)', $error).group(1))    modules=re
+  END
+  RETURN    ${status}
+
+# --- Post body typography ------------------------------------------------------
+
+Get Post Body Typography
+  [Documentation]    Returns the computed size and weight of the first post-body
+  ...    h2, the size and vertical margin of the first post-body paragraph, and
+  ...    the marker style of the first post-body list.
+  ${data}=    Execute Javascript
+  ...    const b=document.querySelector('article .prose'); const h=getComputedStyle(b.querySelector('h2')); const p=getComputedStyle(b.querySelector('p')); const l=b.querySelector('ul, ol'); return {h2_size:parseFloat(h.fontSize), h2_weight:parseInt(h.fontWeight,10), p_size:parseFloat(p.fontSize), p_margin:parseFloat(p.marginTop)+parseFloat(p.marginBottom), list_style:l?getComputedStyle(l).listStyleType:'missing'};
+  RETURN    ${data}
+
+Switch To Theme
+  [Documentation]    Applies a daisyUI theme the same way the theme toggle does,
+  ...    then waits out the 0.2s colour transition so computed colours are the
+  ...    theme's final values rather than a mid-fade blend.
+  [Arguments]    ${theme}
+  Execute Javascript    document.documentElement.setAttribute('data-theme', '${theme}');
+  Sleep    0.5s
+
+Get Post Body Contrast Ratio
+  [Documentation]    Returns the WCAG contrast ratio between the first post-body
+  ...    paragraph's text colour and the nearest opaque background behind it.
+  ${ratio}=    Execute Javascript
+  ...    const p=document.querySelector('article .prose p'); const probe=document.createElement('canvas').getContext('2d'); const rgb=c=>{probe.clearRect(0,0,1,1);probe.fillStyle='rgba(0,0,0,0)';probe.fillStyle=c;probe.fillRect(0,0,1,1);const d=probe.getImageData(0,0,1,1).data;return [d[0],d[1],d[2],d[3]];}; let e=p, bg=null; while(e){const c=getComputedStyle(e).backgroundColor; const v=rgb(c); if(v[3]===255){bg=v;break;} e=e.parentElement;} bg=bg||[255,255,255]; const fg=rgb(getComputedStyle(p).color); const lum=v=>{const s=v.slice(0,3).map(x=>{x/=255;return x<=0.03928?x/12.92:Math.pow((x+0.055)/1.055,2.4);});return 0.2126*s[0]+0.7152*s[1]+0.0722*s[2];}; const a=lum(fg), b=lum(bg); return Math.round(((Math.max(a,b)+0.05)/(Math.min(a,b)+0.05))*100)/100;
+  RETURN    ${ratio}
+
+# --- Contact page --------------------------------------------------------------
+
+Given A Visitor Opens The Contact Page
+  Go To    ${BASE_URL}/contact
+  Wait Until Page Contains Element    css:h1    timeout=10 seconds

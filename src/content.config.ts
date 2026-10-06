@@ -8,6 +8,9 @@ const postSchema = z.object({
   pubDate: z.coerce.date(),
   updatedDate: z.coerce.date().optional(),
   tags: z.array(z.string()).default([]),
+  // Opt-in disclosure. Blog posts render a floating corner badge; slide decks
+  // render a footer in the Marp theme (see src/utils/marp.ts).
+  'ai-assisted': z.boolean().default(false),
 });
 
 const blog = defineCollection({

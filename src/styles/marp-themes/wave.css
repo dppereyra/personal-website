@@ -37,6 +37,41 @@ section::after {
     font-size: medium;
 }
 
+/*
+ * AI-assisted disclosure footer.
+ *
+ * Driven by `ai-assisted: true` in the deck's front matter, which
+ * src/utils/marp.ts translates into Marp's `class` global directive so every
+ * section carries .ai-assisted.
+ *
+ * Sits in the bottom-right corner, stacked directly above the page number
+ * rather than beside it: pagination resolves to the same right:30px/bottom:21px
+ * slot, and sharing that line makes the two overlap once the count reaches two
+ * or three digits. Stacking keeps them clear of each other at any deck length.
+ * Marp's own `footer` element is bottom-left, so it is unaffected either way.
+ */
+section.ai-assisted::before {
+    content: 'AI-assisted (deck)';
+    position: absolute;
+    right: 30px;
+    /* Pagination occupies 21px-45px from the bottom; clear it with a margin. */
+    bottom: 48px;
+    margin: 0;
+    color: white;
+    opacity: 0.7;
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    line-height: 1.5;
+    pointer-events: none;
+}
+
+/* Unpaginated slides have no page number to clear, so the disclosure drops
+   back down to the footer baseline. */
+section.ai-assisted:not([data-marpit-pagination])::before {
+    bottom: 21px;
+}
+
 /* Table style */
 table, tr, td, th {
     all: unset; 
