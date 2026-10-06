@@ -6,6 +6,7 @@ Documentation    Business-language keywords for site navigation, the Home page's
 Resource         common.resource
 
 *** Variables ***
+${HTTP_USER_AGENT}    personal-website-robot-tests/1.0 (+https://github.com/dppereyra/personal-website)
 @{EXPECTED_NAV_TABS}    Home    Blog    Decks    Work    About    Contact
 
 *** Keywords ***
@@ -70,9 +71,12 @@ Get Download PDF Link Url
 Fetch Url
   [Documentation]    Performs a plain HTTP GET against ${url} (independent of the
   ...    browser session) and returns the urllib response object, so response
-  ...    headers and body can be inspected directly.
+  ...    headers and body can be inspected directly. It identifies itself with
+  ...    ${HTTP_USER_AGENT}: Cloudflare in front of the production site answers
+  ...    urllib's default `Python-urllib` agent with 403.
   [Arguments]    ${url}
-  ${response}=    Evaluate    __import__('urllib.request', fromlist=['request']).urlopen('''${url}''', timeout=15)
+  ${request}=    Evaluate    urllib.request.Request('''${url}''', headers={'User-Agent': $HTTP_USER_AGENT})    modules=urllib.request
+  ${response}=    Evaluate    urllib.request.urlopen($request, timeout=15)    modules=urllib.request
   RETURN    ${response}
 
 Get Response Header
@@ -147,6 +151,18 @@ Response For A Requested Path Should Include Baseline Security Headers
   Response Should Set A Safe X-Frame-Options    ${response}    ${description}
   Response Should Set A Sane Referrer-Policy    ${response}    ${description}
   Response Should Set A Non-Trivial Content-Security-Policy    ${response}    ${description}
+  Response Should Set Strict-Transport-Security For A Year    ${response}    ${description}
+
+Response Should Set Strict-Transport-Security For A Year
+  [Documentation]    Asserts the response tells browsers to use HTTPS only, for at
+  ...    least a year (max-age >= 31536000). The header is set at the Netlify
+  ...    origin, but a proxy in front (Cloudflare on production) can drop it,
+  ...    which is why this is checked on deployed surfaces as visitors see them.
+  [Arguments]    ${response}    ${description}
+  ${value}=    Get Response Header    ${response}    Strict-Transport-Security
+  ${max_age}=    Evaluate    int(m.group(1)) if (m := re.search(r'max-age=(\\d+)', $value, re.I)) else 0    modules=re
+  Should Be True    ${max_age} >= 31536000
+  ...    Strict-Transport-Security missing or too short on ${description} (got: "${value}")
 
 Response Should Set X-Content-Type-Options To Nosniff
   [Documentation]    Asserts the response's X-Content-Type-Options header is
