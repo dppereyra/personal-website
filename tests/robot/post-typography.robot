@@ -43,3 +43,15 @@ Post Body Text Stays Readable In The Dark Theme
   ${ratio}=    Get Post Body Contrast Ratio
   Should Be True    ${ratio} >= 4.5
   ...    Post body text contrast in the light theme is ${ratio}:1
+
+Each Post Has A Single Top-Level Heading
+  [Documentation]    The layout renders the front-matter title as the page's h1,
+  ...    so a post body must not open with its own `# Title` — that shows the
+  ...    title twice and gives the page two top-level headings.
+  FOR    ${slug}    IN    marking-ai-assisted-content    the-bootstrap-that-hung-for-six-hours    welcome
+    Go To    ${BASE_URL}/blog/${slug}
+    Wait Until Page Contains Element    css:article    timeout=10 seconds
+    ${count}=    Get Element Count    css:h1
+    Should Be Equal As Integers    ${count}    1
+    ...    /blog/${slug} renders ${count} h1 elements
+  END
