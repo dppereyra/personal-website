@@ -22,7 +22,7 @@ Personal website and blog built with Astro, Svelte, Tailwind CSS, and DaisyUI.
 - 🖼️ Profile image sourced from Gravatar
 - 🧪 Comprehensive testing with Vitest and Robot Framework
 - 🔄 CI/CD with GitHub Actions
-- 🔒 Automated dependency vulnerability checks with Dependabot
+- 🔒 Dependabot version updates, SonarCloud code analysis, and Trivy security scanning in CI
 
 ## Quick Start
 
@@ -162,7 +162,9 @@ All pull requests automatically run:
 - Unit tests with Vitest
 - Browser E2E checks with Robot Framework in Chrome and Firefox
 - Full production build verification, including resume PDF generation
-- Dependabot dependency vulnerability scanning (`.github/dependabot.yml`)
+- Trivy scan for vulnerable dependencies, misconfigurations, and secrets
+
+Dependabot keeps dependency and GitHub Actions versions current (`.github/dependabot.yml`), and SonarCloud analyses everything else — code quality, bugs, and code-level security issues.
 
 ## License
 

@@ -6,8 +6,6 @@ tags: ['meta', 'ai', 'astro', 'marp', 'css', 'testing']
 ai-assisted: true
 ---
 
-# Marking AI-assisted content
-
 Some of what gets published here is written with AI help, and some isn't. Rather than
 leave that to the reader's guesswork, posts and decks carry an explicit flag.
 

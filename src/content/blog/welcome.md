@@ -5,8 +5,6 @@ pubDate: 2026-02-03
 tags: ['welcome', 'first-post', 'about']
 ---
 
-# Welcome!
-
 Hello, and thanks for stopping by.
 
 I'm Dennis — an SRE / DevOps / platform engineer. If you've landed here from a search

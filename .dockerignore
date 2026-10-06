@@ -16,4 +16,5 @@ public/slides/*.pdf
 .env
 .env.*
 !.env.example
+.secrets.act
 .DS_Store

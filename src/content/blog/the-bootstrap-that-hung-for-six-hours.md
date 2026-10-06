@@ -6,8 +6,6 @@ tags: ['azure', 'terraform', 'powershell', 'sql-server', 'debugging']
 ai-assisted: true
 ---
 
-# The bootstrap that hung for six hours
-
 An ordinary setup: Terraform provisions a SQL Server VM, and a PowerShell script runs
 on first boot to install everything the application needs.
 

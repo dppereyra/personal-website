@@ -325,18 +325,35 @@ npm run generate:resume
   - `test`: Runs Vitest tests
   - `e2e-robot`: Runs Robot Framework internal-link checks in Chrome and Firefox against the built site
    - `build`: Runs the full production build to verify tests, PDF generation, and site build all succeed
+  - `trivy`: Scans the repository with Trivy (vulnerabilities, misconfigurations, secrets) and fails on HIGH/CRITICAL findings that have a fix available
 
 **Pull Request Requirements:**
 All PRs must pass:
 1. Type checking (Astro check)
 2. All tests passing
 3. Build succeeds
+4. Trivy scan passes
+
+**Quality and security tooling** — each tool has one job:
+
+| Tool | Owns | Where |
+|---|---|---|
+| Dependabot | Dependency and GitHub Actions **versions** | `.github/dependabot.yml` |
+| SonarCloud | Everything else: code quality, bugs, code-level vulnerabilities, security hotspots | [sonarcloud.io project `dppereyra_personal-website`](https://sonarcloud.io/project/overview?id=dppereyra_personal-website) |
+| Trivy | CI gate for known-vulnerable dependencies, IaC/Dockerfile misconfigurations, and committed secrets | `trivy` job in `.github/workflows/ci.yml` |
 
 **Dependabot** (`.github/dependabot.yml`):
-- Monitors npm dependencies and GitHub Actions weekly
-- Opens PRs for outdated/vulnerable dependencies (`open-pull-requests-limit: 10`)
-- Also shows security alerts in the Security tab
-- Replaces the previous SonarQube-based dependency/quality checks as this project's automated dependency safety net
+- Monitors npm dependencies and GitHub Actions weekly, batched into one grouped PR per ecosystem
+- Responsible only for keeping versions current; do not hand-bump versions it manages
+
+**SonarCloud**:
+- Connected through the SonarCloud web UI using automatic analysis, so there is no `sonar-project.properties` or CI job
+- Automatic analysis does not import test coverage. Adding coverage requires switching to CI-based analysis and turning automatic analysis off first — SonarCloud rejects a CI scan while automatic analysis is enabled
+
+**Trivy**:
+- Runs `aquasecurity/trivy-action` pinned to a commit SHA, with the Trivy CLI version set explicitly
+- Reproduce locally with `trivy fs --scanners vuln,misconfig,secret --severity HIGH,CRITICAL --ignore-unfixed --skip-dirs node_modules --skip-dirs .venv-robot .`
+- Fix findings rather than suppressing them
 
 **Coverage Reports**:
 - Generated locally by Vitest (`npm run test:coverage`) in multiple formats (text, JSON, HTML, LCOV)
@@ -353,6 +370,8 @@ All PRs must pass:
 ## Deployment
 
 Configured for Netlify deployment via netlify-cli. The site is configured for www.dppereyra.com domain.
+
+**Netlify Emails and `netlify/plugins/emails-commonjs`**: the staging Netlify site has `@netlify/plugin-emails` installed from the Netlify UI (not from this repo — it is used outside the codebase and must stay). That plugin copies a CommonJS handler into `.netlify/functions-internal/emails/index.js`, which the root `"type": "module"` turns into an ES module that crashes on load, and Netlify's function bundler now fails the whole build over it. The local `emails-commonjs` plugin, registered in `netlify.toml`, writes `{"type":"commonjs"}` next to that handler. It relies on netlify.toml plugins running after UI-installed plugins, and is a no-op on sites without the emails plugin. Do not remove it while the emails plugin is installed.
 
 **Branch Roles**:
 - `master` - development/local branch, not deployed anywhere critical

@@ -5,6 +5,8 @@ Library    String
 
 *** Variables ***
 ${BASE_URL}             %{BASE_URL=http://127.0.0.1:4321}
+# True only when testing the real public site; mirrors src/utils/site-context.ts.
+${IS_PRODUCTION_SITE}   ${{ '${BASE_URL}'.split('/')[2] in ('dppereyra.com', 'www.dppereyra.com') }}
 ${BROWSER}              %{BROWSER=chrome}
 ${HEADLESS_ARG}         --headless=new
 ${CHROME_BINARY}        %{CHROME_BINARY=}
