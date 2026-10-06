@@ -151,17 +151,18 @@ Response For A Requested Path Should Include Baseline Security Headers
   Response Should Set A Safe X-Frame-Options    ${response}    ${description}
   Response Should Set A Sane Referrer-Policy    ${response}    ${description}
   Response Should Set A Non-Trivial Content-Security-Policy    ${response}    ${description}
-  Response Should Set Strict-Transport-Security For A Year    ${response}    ${description}
+  Response Should Set Strict-Transport-Security For Six Months    ${response}    ${description}
 
-Response Should Set Strict-Transport-Security For A Year
+Response Should Set Strict-Transport-Security For Six Months
   [Documentation]    Asserts the response tells browsers to use HTTPS only, for at
-  ...    least a year (max-age >= 31536000). The header is set at the Netlify
+  ...    least six months (max-age >= 15552000, Cloudflare's recommended
+  ...    setting, which production uses). The header is set at the Netlify
   ...    origin, but a proxy in front (Cloudflare on production) can drop it,
   ...    which is why this is checked on deployed surfaces as visitors see them.
   [Arguments]    ${response}    ${description}
   ${value}=    Get Response Header    ${response}    Strict-Transport-Security
   ${max_age}=    Evaluate    int(m.group(1)) if (m := re.search(r'max-age=(\\d+)', $value, re.I)) else 0    modules=re
-  Should Be True    ${max_age} >= 31536000
+  Should Be True    ${max_age} >= 15552000
   ...    Strict-Transport-Security missing or too short on ${description} (got: "${value}")
 
 Response Should Set X-Content-Type-Options To Nosniff
