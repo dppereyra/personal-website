@@ -49,11 +49,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       libxkbcommon0 \
       libxrandr2 \
       xdg-utils \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir /app && chown node:node /app
 
-# Run as the image's unprivileged `node` user rather than root. /app is created
-# and handed to it first so npm ci and the build can write there.
-RUN mkdir /app && chown node:node /app
+# Run as the image's unprivileged `node` user rather than root. /app was
+# created and handed to it above so npm ci and the build can write there.
 USER node
 WORKDIR /app
 
@@ -66,7 +66,14 @@ WORKDIR /app
 COPY --chown=node:node package.json package-lock.json ./
 RUN npm ci
 
-COPY --chown=node:node . .
+# Copy only what the suite below needs, not the whole context, so local files
+# such as act's .secrets.act can never end up in the image.
+COPY --chown=node:node astro.config.mjs svelte.config.js tsconfig.json \
+     vitest.config.ts vitest.setup.ts sentry.client.config.ts ./
+COPY --chown=node:node src ./src
+COPY --chown=node:node public ./public
+COPY --chown=node:node scripts ./scripts
+COPY --chown=node:node netlify ./netlify
 
 # Everything CI runs, plus the two puppeteer PDF paths. Robot Framework's
 # browser suite is deliberately excluded — it needs a served site and is
