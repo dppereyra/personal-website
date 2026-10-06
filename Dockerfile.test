@@ -51,6 +51,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       xdg-utils \
     && rm -rf /var/lib/apt/lists/*
 
+# Run as the image's unprivileged `node` user rather than root. /app is created
+# and handed to it first so npm ci and the build can write there.
+RUN mkdir /app && chown node:node /app
+USER node
 WORKDIR /app
 
 # Install from the lockfile before copying source, so this layer caches
@@ -59,10 +63,10 @@ WORKDIR /app
 # Plain `npm ci` with no flags, matching CI: a lockfile that only resolves
 # with --legacy-peer-deps fails the image build here rather than passing
 # quietly and surfacing later on someone's clean clone.
-COPY package.json package-lock.json ./
+COPY --chown=node:node package.json package-lock.json ./
 RUN npm ci
 
-COPY . .
+COPY --chown=node:node . .
 
 # Everything CI runs, plus the two puppeteer PDF paths. Robot Framework's
 # browser suite is deliberately excluded — it needs a served site and is
