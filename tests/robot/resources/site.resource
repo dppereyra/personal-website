@@ -334,3 +334,9 @@ Get Post Body Contrast Ratio
   ${ratio}=    Execute Javascript
   ...    const p=document.querySelector('article .prose p'); const probe=document.createElement('canvas').getContext('2d'); const rgb=c=>{probe.clearRect(0,0,1,1);probe.fillStyle='rgba(0,0,0,0)';probe.fillStyle=c;probe.fillRect(0,0,1,1);const d=probe.getImageData(0,0,1,1).data;return [d[0],d[1],d[2],d[3]];}; let e=p, bg=null; while(e){const c=getComputedStyle(e).backgroundColor; const v=rgb(c); if(v[3]===255){bg=v;break;} e=e.parentElement;} bg=bg||[255,255,255]; const fg=rgb(getComputedStyle(p).color); const lum=v=>{const s=v.slice(0,3).map(x=>{x/=255;return x<=0.03928?x/12.92:Math.pow((x+0.055)/1.055,2.4);});return 0.2126*s[0]+0.7152*s[1]+0.0722*s[2];}; const a=lum(fg), b=lum(bg); return Math.round(((Math.max(a,b)+0.05)/(Math.min(a,b)+0.05))*100)/100;
   RETURN    ${ratio}
+
+# --- Contact page --------------------------------------------------------------
+
+Given A Visitor Opens The Contact Page
+  Go To    ${BASE_URL}/contact
+  Wait Until Page Contains Element    css:h1    timeout=10 seconds

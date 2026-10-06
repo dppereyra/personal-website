@@ -18,7 +18,7 @@ Personal website and blog built with Astro, Svelte, Tailwind CSS, and DaisyUI.
 - 📝 Blog with Markdown support via Astro Content Collections
 - 🎨 Styled with Tailwind CSS and DaisyUI components
 - ⚡ Fast static site generation with Astro
-- ✉️ Working contact form via Netlify Forms (AJAX submission with success/error feedback)
+- ✉️ Contact page with an "Email Me" mailto button and Calendly booking
 - 🖼️ Profile image sourced from Gravatar
 - 🧪 Comprehensive testing with Vitest and Robot Framework
 - 🔄 CI/CD with GitHub Actions
