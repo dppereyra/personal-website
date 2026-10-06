@@ -9,7 +9,7 @@ export default defineConfig(
     test: {
       globals: true,
       environment: 'jsdom',
-      include: ['src/**/*.{test,spec}.{js,ts,svelte}', 'netlify/**/*.{test,spec}.js'],
+      include: ['src/**/*.{test,spec}.{js,ts,svelte}'],
       setupFiles: ['./vitest.setup.ts'],
       coverage: {
         provider: 'v8',
