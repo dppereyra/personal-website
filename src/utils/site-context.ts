@@ -17,6 +17,11 @@ const PRODUCTION_ORIGINS = new Set([
   'https://www.dppereyra.com',
 ]);
 
+// The origin the production site actually serves from: the apex 301s here,
+// and RSS and the sitemap emit it. Use it for anything that must name the
+// real site regardless of which origin a build was given.
+export const CANONICAL_PRODUCTION_ORIGIN = 'https://www.dppereyra.com';
+
 export function isProductionSite(url = process.env.URL): boolean {
   if (!url) return false;
   try {

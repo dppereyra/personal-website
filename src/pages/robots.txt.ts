@@ -5,12 +5,12 @@
 // for why this can't be a plain `CONTEXT === 'production'` check: Netlify
 // reports CONTEXT as 'production' for staging's own production-context
 // build too, not just the real production site's.
-import { isProductionSite } from '../utils/site-context';
+import { CANONICAL_PRODUCTION_ORIGIN, isProductionSite } from '../utils/site-context';
 
 const isProduction = isProductionSite();
 
 const body = isProduction
-  ? 'User-agent: *\nAllow: /\n'
+  ? `User-agent: *\nAllow: /\n\nSitemap: ${CANONICAL_PRODUCTION_ORIGIN}/sitemap-index.xml\n`
   : 'User-agent: *\nDisallow: /\n';
 
 export function GET() {

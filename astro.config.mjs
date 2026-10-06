@@ -2,9 +2,13 @@ import { defineConfig } from 'astro/config';
 
 import svelte from '@astrojs/svelte';
 
+import sitemap from '@astrojs/sitemap';
+
 import tailwindcss from '@tailwindcss/vite';
 
 import sentry from '@sentry/astro';
+
+import { isProductionSite } from './src/utils/site-context';
 
 // Netlify sets CONTEXT to 'production' only for builds off a site's own
 // configured Production branch (confirmed via `netlify api getSite`: the
@@ -35,6 +39,10 @@ export default defineConfig({
   site,
   integrations: [
     svelte(),
+    // Only the real production site publishes a sitemap. Every other surface
+    // is disallowed in robots.txt, and a sitemap there would advertise its
+    // staging or preview hostname.
+    ...(isProductionSite(site) ? [sitemap()] : []),
     sentry({
       enabled: !!process.env.PUBLIC_SENTRY_DSN,
       org: process.env.SENTRY_ORG,
