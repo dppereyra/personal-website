@@ -4,14 +4,13 @@
 // (staging, deploy previews, branch deploys, local dev): noindex tagging
 // today, potentially other production-only behavior later.
 //
-// Netlify's CONTEXT env var is 'production' for ANY site's own configured
-// Production branch build — including the staging Netlify site's (whose
-// Production branch is `staging`), not just the real production site's
-// (whose Production branch is `production`). See astro.config.mjs's `site`
-// comment for the full reasoning. So CONTEXT alone cannot distinguish "the
-// real public site" from "staging's own production-context build" — both
-// report CONTEXT === 'production'. Comparing the resolved URL's origin
-// against the one known production origin is the reliable check.
+// Neither Netlify variable answers that on its own. CONTEXT is 'production'
+// for any Netlify site's own production-branch build, not only the real one.
+// URL is a project's primary domain for EVERY build of that project, so on a
+// single project serving both production and the `staging` branch deploy,
+// staging's URL is www.dppereyra.com too. The reliable check is the address
+// this particular build actually serves (resolveSiteUrl) compared against the
+// known production origins.
 const PRODUCTION_ORIGINS = new Set([
   'https://dppereyra.com',
   'https://www.dppereyra.com',
@@ -22,7 +21,21 @@ const PRODUCTION_ORIGINS = new Set([
 // real site regardless of which origin a build was given.
 export const CANONICAL_PRODUCTION_ORIGIN = 'https://www.dppereyra.com';
 
-export function isProductionSite(url = process.env.URL): boolean {
+type SiteEnv = Partial<Record<'SITE_URL' | 'CONTEXT' | 'URL' | 'DEPLOY_PRIME_URL', string>>;
+
+// The address this build serves; astro.config.mjs uses it as Astro's `site`.
+// A production-context build serves the project's stable primary domain
+// (URL); DEPLOY_PRIME_URL there can be an ephemeral branch alias, which would
+// break permanent links such as RSS guids. Every other context (branch
+// deploys such as `staging`, deploy previews) serves its own address,
+// DEPLOY_PRIME_URL. SITE_URL overrides both, e.g. for a local production build.
+export function resolveSiteUrl(env: SiteEnv = process.env): string {
+  return env.SITE_URL
+    ?? (env.CONTEXT === 'production' ? env.URL : env.DEPLOY_PRIME_URL)
+    ?? 'http://localhost:4321';
+}
+
+export function isProductionSite(url: string | undefined = resolveSiteUrl()): boolean {
   if (!url) return false;
   try {
     return PRODUCTION_ORIGINS.has(new URL(url).origin);
