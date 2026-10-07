@@ -148,7 +148,7 @@ See [AGENTS.md](./AGENTS.md) for detailed development guide, architecture, and c
 
 ## Deployment
 
-Work happens on `dev`, and every push to it deploys to staging (the Netlify branch deploy of `dev`). A pull request from `dev` → `master` is the release: once its deploy preview is verified, merging deploys `master` to www.dppereyra.com and creates a GitHub Release. `master` is protected, so changes reach production only through that pull request.
+Work happens on short-lived branches merged into `dev` by pull request; each merge deploys staging (the Netlify branch deploy of `dev`). A pull request from `dev` → `master` is the release: once its deploy preview is verified, merging deploys `master` to www.dppereyra.com and creates a GitHub Release. `dev` and `master` are both protected, so changes reach staging and production only through pull requests.
 
 ## CI/CD
 
