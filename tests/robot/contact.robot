@@ -50,3 +50,14 @@ The Page Does Not Repeat Its Options In A Closing Banner
   ${banners}=    Get Element Count    css:main .alert
   Should Be Equal As Integers    ${banners}    0
   ...    The Contact page still shows ${banners} alert banner(s)
+
+Get In Touch Sits Above Other Ways To Connect
+  [Documentation]    The two cards stack vertically even on a wide screen, with
+  ...    Get in Touch first, rather than sitting side by side.
+  Restore Desktop Viewport
+  Given A Visitor Opens The Contact Page
+  ${layout}=    Execute Javascript
+  ...    const cards=[...document.querySelectorAll('main .card')]; const at=t=>cards.find(c=>c.querySelector('h2')?.textContent.trim()===t)?.getBoundingClientRect(); const a=at('Get in Touch'), b=at('Other Ways to Connect'); return {found: !!(a && b), stacked: !!(a && b && b.top >= a.bottom), left_aligned: !!(a && b && Math.abs(a.left - b.left) < 2)};
+  Should Be True    ${layout}[found]    Could not find both contact cards
+  Should Be True    ${layout}[stacked]    Other Ways to Connect is not below Get in Touch
+  Should Be True    ${layout}[left_aligned]    The contact cards are not stacked in one column
