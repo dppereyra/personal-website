@@ -3,6 +3,8 @@ updates:
   # Monitor npm dependencies
   - package-ecosystem: "npm"
     directory: "/"
+    # Work lands on dev; master only receives dev -> master release PRs.
+    target-branch: "dev"
     schedule:
       interval: "weekly"
       day: "friday"
@@ -23,6 +25,8 @@ updates:
   # Monitor GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
+    # Work lands on dev; master only receives dev -> master release PRs.
+    target-branch: "dev"
     schedule:
       interval: "weekly"
       day: "friday"

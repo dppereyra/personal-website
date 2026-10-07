@@ -24,6 +24,7 @@ Open Browser To Page
       Evaluate    setattr($options, 'binary_location', r'''${CHROME_BINARY}''')
     END
     Create Webdriver    Chrome    options=${options}
+    Block Netlify Review Toolbar
   ELSE
     Call Method    ${options}    add_argument    --headless
     IF    '${FIREFOX_BINARY}' != ''
@@ -33,6 +34,16 @@ Open Browser To Page
   END
   Set Selenium Speed    0 seconds
   Go To    ${BASE_URL}${path}
+
+Block Netlify Review Toolbar
+  [Documentation]    Netlify injects its review toolbar (the Drawer, loaded from
+  ...    /.netlify/scripts/cdp) into deploy previews only. Pinned over the page
+  ...    in the headless window, it intercepts clicks the tests make, so the
+  ...    script is blocked to make previews behave like staging and production.
+  ...    Reviewers browsing a preview still get the toolbar.
+  ${sl}=    Get Library Instance    SeleniumLibrary
+  Call Method    ${sl.driver}    execute_cdp_cmd    Network.enable    ${{ {} }}
+  Call Method    ${sl.driver}    execute_cdp_cmd    Network.setBlockedURLs    ${{ {'urls': ['*/.netlify/scripts/cdp*']} }}
 
 Close Browser Session
   Close All Browsers

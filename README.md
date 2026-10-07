@@ -148,12 +148,7 @@ See [AGENTS.md](./AGENTS.md) for detailed development guide, architecture, and c
 
 ## Deployment
 
-Changes are promoted forward one branch at a time via pull request:
-
-1. **PR from `master` → `staging`**
-2. **PR from `staging` → `production`**, once verified on staging
-
-`master` is development/local only. `staging` and `production` are protected branches — direct pushes are rejected, so this PR-based flow is the only way changes reach them.
+Work happens on `dev`, and every push to it deploys to staging (the Netlify branch deploy of `dev`). A pull request from `dev` → `master` is the release: once its deploy preview is verified, merging deploys `master` to www.dppereyra.com and creates a GitHub Release. `master` is protected, so changes reach production only through that pull request.
 
 ## CI/CD
 

@@ -3,14 +3,12 @@ name: CI
 on:
   push:
     branches:
+      - dev
       - master
-      - production
-      - staging
   pull_request:
     branches:
+      - dev
       - master
-      - production
-      - staging
 
 # Cancel in-progress runs for the same workflow and branch
 concurrency:
