@@ -374,10 +374,10 @@ Configured for Netlify deployment via netlify-cli. The site is configured for ww
 Staging and production are served by one Netlify project, `www-dppereyra-production` (to be renamed `dppereyra-website`).
 
 **Branch Roles**:
-- `dev` - the working branch. Every push deploys to **staging**, the Netlify branch deploy at `https://dev--www-dppereyra-production.netlify.app`
+- `dev` - the integration branch and **staging**: each merge deploys the Netlify branch deploy at `https://dev--www-dppereyra-production.netlify.app`. Protected: changes arrive only through pull requests from short-lived branches, so staging rebuilds once per merged change rather than on every commit
 - `master` - **production**, deployed to www.dppereyra.com. Protected: changes arrive only through a pull request from `dev`
 
-**Release flow**: work lands on `dev` (pushed directly or merged from a short-lived branch), is verified on staging, and is released by a pull request from `dev` → `master`. Merging that PR is the promotion: Netlify deploys `master` to production, the `newrelic-deploy-marker` build plugin records the deploy in New Relic, and `release.yml` creates the dated GitHub Release.
+**Release flow**: work happens on a short-lived branch, reaches `dev` through a pull request (whose deploy preview is checked first), is verified on staging, and is released by a pull request from `dev` → `master`. Merging that PR is the promotion: Netlify deploys `master` to production, the `newrelic-deploy-marker` build plugin records the deploy in New Relic, and `release.yml` creates the dated GitHub Release.
 
 **Environments**, as the site sees them (`src/utils/site-context.ts`, `src/utils/newrelic-config.ts`):
 
@@ -392,7 +392,7 @@ Staging and production are served by one Netlify project, `www-dppereyra-product
 1. Write tests first, before the implementation they cover
 2. Get security input before writing code that touches auth, dependencies, secrets, or anything externally exposed (new endpoints, headers, forms) — not just a post-hoc review after the fact
 3. Write the implementation
-4. Push to `dev` (or merge a short-lived branch into it)
+4. Push to a short-lived branch and open a pull request into `dev`; once CI and its deploy preview pass, merge it
 5. Once the `dev` branch deploy is live, verify staging — both a QA pass (exercise the actual feature in a real browser, not just unit tests) and a security pass (for anything touching the areas in step 2): `BASE_URL=<staging URL> NEW_RELIC_ENVIRONMENT=staging npm run test:robot:site`
 6. Open the release PR from `dev` → `master`
 7. Wait for its Netlify deploy preview and verify it with QA/security the same way (`NEW_RELIC_ENVIRONMENT=preview`)
