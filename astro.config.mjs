@@ -9,6 +9,7 @@ import tailwindcss from '@tailwindcss/vite';
 import sentry from '@sentry/astro';
 
 import { isProductionSite, resolveSiteUrl } from './src/utils/site-context';
+import { buildNewRelicOptions } from './src/utils/newrelic-config';
 
 // The address this build serves; see resolveSiteUrl for how each Netlify
 // context maps to it.
@@ -39,5 +40,10 @@ export default defineConfig({
 
   vite: {
     plugins: [tailwindcss()],
+    // New Relic Browser settings for this build, or null to ship no agent;
+    // read by src/scripts/newrelic.ts.
+    define: {
+      __NEW_RELIC__: JSON.stringify(buildNewRelicOptions()),
+    },
   },
 });

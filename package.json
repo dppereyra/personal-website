@@ -32,6 +32,7 @@
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "3.7.4",
     "@astrojs/svelte": "9.0.1",
+    "@newrelic/browser-agent": "1.323.0",
     "@tailwindcss/vite": "4.3.3",
     "astro": "7.3.5",
     "svelte": "5.57.1",

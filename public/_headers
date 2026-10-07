@@ -29,6 +29,10 @@
 #     next time this file is touched.
 #   - 'unsafe-eval' is deliberately NOT included — nothing in this build
 #     (Astro static output, Svelte islands compiled ahead of time) needs it.
+#   - connect-src allows https://bam.nr-data.net, New Relic's US collector,
+#     and no other New Relic host: the Browser agent is bundled from npm
+#     (src/scripts/newrelic.ts), so nothing is loaded from New Relic, and
+#     the account lives in the US datacenter.
 #   - img-src allows https://raw.githubusercontent.com: the vendored Marp
 #     Wave theme (src/styles/marp-themes/wave.css) loads its background
 #     wave graphic from there via a CSS background-image url(), which CSP
@@ -39,4 +43,4 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Strict-Transport-Security: max-age=63072000
   Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), interest-cohort=(), browsing-topics=(), fullscreen=(self)
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://www.gravatar.com https://raw.githubusercontent.com https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io; frame-src 'self' https://*.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://www.gravatar.com https://raw.githubusercontent.com https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io https://bam.nr-data.net; frame-src 'self' https://*.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
