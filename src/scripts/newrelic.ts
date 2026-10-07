@@ -4,7 +4,11 @@
 import { NEW_RELIC_OBFUSCATE } from '../utils/newrelic-obfuscate';
 
 if (__NEW_RELIC__) {
-  void start(__NEW_RELIC__);
+  // Monitoring must never break the page: a failed import or init is logged,
+  // not left as an unhandled rejection.
+  start(__NEW_RELIC__).catch((error: unknown) => {
+    console.warn('New Relic Browser agent failed to start', error);
+  });
 }
 
 async function start(options: NonNullable<typeof __NEW_RELIC__>) {

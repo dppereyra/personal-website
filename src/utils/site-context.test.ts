@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { isProductionSite, resolveSiteUrl } from './site-context';
 
 // Netlify environments as each kind of build sees them. On a single Netlify
@@ -45,14 +45,13 @@ describe('isProductionSite', () => {
     expect(isProductionSite(resolveSiteUrl(env))).toBe(false);
   });
 
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it('defaults to the resolved site of the current build, not the raw URL variable', () => {
-    const saved = { ...process.env };
-    try {
-      Object.assign(process.env, STAGING_BRANCH);
-      delete process.env.SITE_URL;
-      expect(isProductionSite()).toBe(false);
-    } finally {
-      process.env = saved;
-    }
+    for (const [key, value] of Object.entries(STAGING_BRANCH)) vi.stubEnv(key, value);
+    vi.stubEnv('SITE_URL', undefined);
+    expect(isProductionSite()).toBe(false);
   });
 });
