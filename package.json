@@ -41,13 +41,13 @@
   "devDependencies": {
     "@astrojs/check": "0.9.10",
     "@marp-team/marp-core": "^4.4.0",
-    "@sentry/astro": "11.1.0",
+    "@sentry/astro": "11.4.0",
     "@tailwindcss/typography": "0.5.20",
     "@testing-library/dom": "10.4.2",
     "@testing-library/svelte": "5.4.2",
-    "@vitest/coverage-v8": "5.0.2",
-    "@vitest/ui": "5.0.2",
-    "daisyui": "5.7.46",
+    "@vitest/coverage-v8": "5.0.3",
+    "@vitest/ui": "5.0.3",
+    "daisyui": "5.7.47",
     "happy-dom": "20.14.5",
     "jsdom": "30.1.1",
     "jsonresume-theme-even": "0.26.1",
@@ -55,8 +55,8 @@
     "puppeteer": "25.12.0",
     "resumed": "7.0.0",
     "typescript": "5.9.3",
-    "vitest": "5.0.2",
-    "wait-on": "^9.4.0"
+    "vitest": "5.0.3",
+    "wait-on": "^9.5.1"
   },
   "overrides": {
     "vite": "8.1.5",
