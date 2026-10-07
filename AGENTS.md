@@ -371,8 +371,6 @@ All PRs must pass:
 
 Configured for Netlify deployment via netlify-cli. The site is configured for www.dppereyra.com domain.
 
-**Netlify Emails and `netlify/plugins/emails-commonjs`**: the staging Netlify site has `@netlify/plugin-emails` installed from the Netlify UI (not from this repo — it is used outside the codebase and must stay). That plugin copies a CommonJS handler into `.netlify/functions-internal/emails/index.js`, which the root `"type": "module"` turns into an ES module that crashes on load, and Netlify's function bundler now fails the whole build over it. The local `emails-commonjs` plugin, registered in `netlify.toml`, writes `{"type":"commonjs"}` next to that handler. It relies on netlify.toml plugins running after UI-installed plugins, and is a no-op on sites without the emails plugin. Do not remove it while the emails plugin is installed.
-
 **Branch Roles**:
 - `master` - development/local branch, not deployed anywhere critical
 - `staging` - staging branch/site, protected
