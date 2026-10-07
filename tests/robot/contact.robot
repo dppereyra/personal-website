@@ -42,3 +42,11 @@ Email Me Is The Primary Action, Ahead Of Booking A Meeting
   ...    Email Me should come before Schedule a Meeting on the page
   ${class}=    Get Element Attribute    ${EMAIL_ME_LINK}    class
   Should Contain    ${class}    btn-primary
+
+The Page Does Not Repeat Its Options In A Closing Banner
+  [Documentation]    The two cards already offer Email Me and Schedule a Meeting;
+  ...    a banner restating them below is redundant.
+  Given A Visitor Opens The Contact Page
+  ${banners}=    Get Element Count    css:main .alert
+  Should Be Equal As Integers    ${banners}    0
+  ...    The Contact page still shows ${banners} alert banner(s)
