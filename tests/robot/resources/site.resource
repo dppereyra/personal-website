@@ -357,3 +357,14 @@ Get Post Body Contrast Ratio
 Given A Visitor Opens The Contact Page
   Go To    ${BASE_URL}/contact
   Wait Until Page Contains Element    css:h1    timeout=10 seconds
+
+# --- New Relic Browser -----------------------------------------------------------
+
+Get New Relic Agent State
+  [Documentation]    Waits for the page's scripts to settle, then returns how many
+  ...    New Relic agents started and, for the first, its environment tag,
+  ...    release and sorted feature list.
+  Sleep    2s
+  ${state}=    Execute Javascript
+  ...    const agents = Object.values(window.NREUM?.initializedAgents || {}); const a = agents[0]; const attrs = a?.info?.jsAttributes || {}; return {count: agents.length, environment: attrs.environment || '', release: attrs['application.version'] || '', features: a ? Object.keys(a.features || {}).sort() : []};
+  RETURN    ${state}

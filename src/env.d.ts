@@ -15,3 +15,6 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+// Injected by astro.config.mjs (vite.define) from src/utils/newrelic-config.ts.
+declare const __NEW_RELIC__: import('./utils/newrelic-config').NewRelicOptions | null;

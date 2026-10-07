@@ -2,9 +2,8 @@
 // Everything else — staging, deploy previews, branch deploys, local dev —
 // is disallowed outright, so search bots don't crawl (and index, or add to
 // GA hit volume) a duplicate of the real site. See src/utils/site-context.ts
-// for why this can't be a plain `CONTEXT === 'production'` check: Netlify
-// reports CONTEXT as 'production' for staging's own production-context
-// build too, not just the real production site's.
+// for why this compares the build's own address rather than CONTEXT or URL
+// alone.
 import { CANONICAL_PRODUCTION_ORIGIN, isProductionSite } from '../utils/site-context';
 
 const isProduction = isProductionSite();
