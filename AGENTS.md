@@ -371,26 +371,34 @@ All PRs must pass:
 
 Configured for Netlify deployment via netlify-cli. The site is configured for www.dppereyra.com domain.
 
+Staging and production are served by one Netlify project, `www-dppereyra-production` (to be renamed `dppereyra-website`).
+
 **Branch Roles**:
-- `master` - development/local branch, not deployed anywhere critical
-- `staging` - staging branch/site, protected
-- `production` - production branch/site, protected
+- `dev` - the working branch. Every push deploys to **staging**, the Netlify branch deploy at `https://dev--www-dppereyra-production.netlify.app`
+- `master` - **production**, deployed to www.dppereyra.com. Protected: changes arrive only through a pull request from `dev`
 
-**Promotion flow**: changes land on `master` first, then flow forward one branch at a time via pull request — never push or merge directly into `staging` or `production`. `staging` and `production` are protected branches, so direct pushes are rejected and this PR-based promotion is the only way changes reach them.
+**Release flow**: work lands on `dev` (pushed directly or merged from a short-lived branch), is verified on staging, and is released by a pull request from `dev` → `master`. Merging that PR is the promotion: Netlify deploys `master` to production, the `newrelic-deploy-marker` build plugin records the deploy in New Relic, and `release.yml` creates the dated GitHub Release.
 
-**Full development loop** (the whole sequence, not just the branch promotion):
+**Environments**, as the site sees them (`src/utils/site-context.ts`, `src/utils/newrelic-config.ts`):
+
+| Surface | Netlify context | robots.txt / noindex / sitemap | New Relic `environment` |
+|---|---|---|---|
+| `master` on www.dppereyra.com | production | Allow / none / published | `production` |
+| `dev` branch deploy (staging) | branch-deploy | Disallow / noindex / none | `staging` |
+| Pull request deploy previews | deploy-preview | Disallow / noindex / none | `preview` |
+| Local and CI builds | none | Disallow / noindex / none | no agent |
+
+**Full development loop** (the whole sequence, not just the branch flow):
 1. Write tests first, before the implementation they cover
 2. Get security input before writing code that touches auth, dependencies, secrets, or anything externally exposed (new endpoints, headers, forms) — not just a post-hoc review after the fact
 3. Write the implementation
-4. Push to `master`
-5. Open a PR from `master` → `staging`
-6. Wait for the PR's Netlify deploy preview, then have it verified — both a QA pass (exercise the actual feature in a real browser, not just unit tests) and a security pass (for anything touching the areas in step 2) — against that deploy preview
-7. Merge to `staging`
-8. Run another QA/security round against the real, now-deployed `staging` site itself — deploy-preview behavior isn't guaranteed identical to a real deploy (response headers, env-var-dependent branching, etc. can differ)
-9. Once `staging` is verified, open a PR from `staging` → `production`
-10. Wait for that PR's deploy preview and have it checked by QA/security too, same as step 6
-11. Merge to `production`
+4. Push to `dev` (or merge a short-lived branch into it)
+5. Once the `dev` branch deploy is live, verify staging — both a QA pass (exercise the actual feature in a real browser, not just unit tests) and a security pass (for anything touching the areas in step 2): run the full Robot suite against it with `NEW_RELIC_ENVIRONMENT=staging`
+6. Open the release PR from `dev` → `master`
+7. Wait for its Netlify deploy preview and verify it with QA/security the same way (`NEW_RELIC_ENVIRONMENT=preview`)
+8. Merge to `master`
+9. Verify production itself — deploy-preview behaviour isn't guaranteed identical to a real deploy (response headers through Cloudflare, env-var-dependent branching): the full Robot suite against www.dppereyra.com with `NEW_RELIC_ENVIRONMENT=production`, the New Relic deploy marker for the commit, and the GitHub Release
 
-Steps 6–8 and 10 are real verification gates, not formalities — confirm the actual behavior (build a fresh local build, curl the live headers/feeds, drive a real browser) rather than trusting a report at face value. Production only ever gets touched via step 9–11, and only once staging is actually confirmed good, not just "PR opened."
+Steps 5, 7 and 9 are real verification gates, not formalities — confirm the actual behavior (build a fresh local build, curl the live headers/feeds, drive a real browser) rather than trusting a report at face value. Production only ever changes through steps 6–8, and only once staging is actually confirmed good, not just "PR opened."
 
-**Checking deploy readiness by polling headers**: the `*.netlify.app` URLs (deploy previews, `staging`/`production` branch subdomains) are served directly by Netlify and return an `etag` header. `www.dppereyra.com` is fronted by Cloudflare in front of Netlify and does not return `etag` — a `curl` loop polling for that header on the apex domain will hang forever. Poll `cache-status`/`age` or the Netlify API's deploy `state` instead when checking the live production domain specifically.
+**Checking deploy readiness by polling headers**: the `*.netlify.app` URLs (deploy previews, the `dev` branch deploy) are served directly by Netlify and return an `etag` header. `www.dppereyra.com` is fronted by Cloudflare in front of Netlify and does not return `etag` — a `curl` loop polling for that header on the apex domain will hang forever. Poll `cache-status`/`age` or the Netlify API's deploy `state` instead when checking the live production domain specifically.

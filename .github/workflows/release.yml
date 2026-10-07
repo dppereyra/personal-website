@@ -1,9 +1,10 @@
 name: Release
 
+# A merge of the dev -> master release PR is a production release.
 on:
   push:
     branches:
-      - production
+      - master
 
 permissions:
   contents: write
@@ -43,6 +44,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create "${{ steps.tag.outputs.tag }}" \
-            --target production \
+            --target master \
             --title "${{ steps.tag.outputs.tag }}" \
             --generate-notes
