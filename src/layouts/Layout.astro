@@ -14,8 +14,8 @@ const { title, description = 'Personal website and blog' } = Astro.props;
 // Only the real production site (dppereyra.com) skips noindex. Every other
 // context — staging, deploy previews, branch deploys, local dev — gets one,
 // so those builds don't get crawled or indexed as duplicate content
-// alongside the real site. See src/utils/site-context.ts for why this can't
-// be a plain `CONTEXT === 'production'` check.
+// alongside the real site. See src/utils/site-context.ts for why this
+// compares the build's own address rather than CONTEXT or URL alone.
 const isProduction = isProductionSite();
 ---
 
