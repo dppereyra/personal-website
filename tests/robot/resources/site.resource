@@ -361,10 +361,17 @@ Given A Visitor Opens The Contact Page
 # --- New Relic Browser -----------------------------------------------------------
 
 Get New Relic Agent State
-  [Documentation]    Waits for the page's scripts to settle, then returns how many
-  ...    New Relic agents started and, for the first, its environment tag,
-  ...    release and sorted feature list.
-  Sleep    2s
+  [Documentation]    Returns how many New Relic agents started and, for the first,
+  ...    its environment tag, release and sorted feature list. When an agent is
+  ...    expected (NEW_RELIC_ENVIRONMENT is set) it waits for one to start, up
+  ...    to 10 seconds; otherwise it gives the page's scripts a short moment to
+  ...    run before checking that none did.
+  IF    $NEW_RELIC_ENVIRONMENT
+    Wait For Condition    return Object.keys(window.NREUM?.initializedAgents || {}).length > 0    timeout=10s
+    ...    error=No New Relic agent started within 10 seconds
+  ELSE
+    Sleep    1s
+  END
   ${state}=    Execute Javascript
   ...    const agents = Object.values(window.NREUM?.initializedAgents || {}); const a = agents[0]; const attrs = a?.info?.jsAttributes || {}; return {count: agents.length, environment: attrs.environment || '', release: attrs['application.version'] || '', features: a ? Object.keys(a.features || {}).sort() : []};
   RETURN    ${state}
