@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { browserEntityGuid, deploymentInput, onSuccess } from './index.js';
+import * as plugin from './index.js';
+import { onSuccess } from './index.js';
+import { browserEntityGuid, deploymentInput } from './marker.js';
 
 const NR = { NEW_RELIC_API_KEY: 'NRAK-TEST', NEW_RELIC_ACCOUNT_ID: '1111111', NEW_RELIC_APP_ID: '2222222222' };
 const PRODUCTION = { ...NR, CONTEXT: 'production', URL: 'https://www.dppereyra.com', COMMIT_REF: 'abc123def4567890', BRANCH: 'production', DEPLOY_URL: 'https://6ac5-dppereyra-website.netlify.app', DEPLOY_ID: '6ac5' };
@@ -7,6 +9,15 @@ const PRODUCTION = { ...NR, CONTEXT: 'production', URL: 'https://www.dppereyra.c
 const LEGACY_STAGING_SITE = { ...PRODUCTION, URL: 'https://www-dppereyra-staging.netlify.app', BRANCH: 'staging' };
 const STAGING_BRANCH = { ...PRODUCTION, CONTEXT: 'branch-deploy', BRANCH: 'staging' };
 const PREVIEW = { ...PRODUCTION, CONTEXT: 'deploy-preview', BRANCH: 'feature-x' };
+
+// Netlify refuses to load a plugin whose entry module exports anything other
+// than lifecycle event handlers, so helpers live in marker.js.
+describe('plugin entry module', () => {
+  it('exports only Netlify build event handlers', () => {
+    const events = ['onPreBuild', 'onBuild', 'onPostBuild', 'onSuccess', 'onError', 'onEnd'];
+    expect(Object.keys(plugin).filter((name) => !events.includes(name))).toEqual([]);
+  });
+});
 
 describe('browserEntityGuid', () => {
   it("builds New Relic's entity GUID for the Browser app", () => {
