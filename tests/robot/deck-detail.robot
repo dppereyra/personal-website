@@ -9,6 +9,7 @@ Resource         resources/site.resource
 Suite Setup      Open Browser To Page    /slides/welcome
 Suite Teardown   Close Browser Session
 Test Setup       Given A Visitor Opens The Welcome Deck Detail Page
+Test Teardown    Note Netlify Challenge If The Test Failed
 
 *** Test Cases ***
 Deck Detail Page Offers A Working PDF Download

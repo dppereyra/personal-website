@@ -25,6 +25,7 @@
     "test:robot:firefox": "BROWSER=firefox npm run test:robot",
     "test:robot:all": "npm run test:robot:chrome && npm run test:robot:firefox",
     "test:robot:deployed": "robot --outputdir robot-results --include deployed-only tests/robot",
+    "test:robot:site": "python3 tests/robot/run_deployed.py",
     "generate:resume": "node scripts/generate-resume-pdf.js",
     "generate:slides": "node scripts/generate-slide-pdfs.js"
   },

@@ -2,6 +2,7 @@
 Resource    resources/common.resource
 Suite Setup    Open Browser To Page    /
 Suite Teardown    Close Browser Session
+Test Teardown    Note Netlify Challenge If The Test Failed
 
 *** Test Cases ***
 All Internal Clickable Destinations Should Not 404

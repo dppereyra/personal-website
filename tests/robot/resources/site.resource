@@ -75,8 +75,7 @@ Fetch Url
   ...    ${HTTP_USER_AGENT}: Cloudflare in front of the production site answers
   ...    urllib's default `Python-urllib` agent with 403.
   [Arguments]    ${url}
-  ${request}=    Evaluate    urllib.request.Request('''${url}''', headers={'User-Agent': $HTTP_USER_AGENT})    modules=urllib.request
-  ${response}=    Evaluate    urllib.request.urlopen($request, timeout=15)    modules=urllib.request
+  ${response}=    Fetch Url Identified As    ${url}    ${HTTP_USER_AGENT}
   RETURN    ${response}
 
 Get Response Header

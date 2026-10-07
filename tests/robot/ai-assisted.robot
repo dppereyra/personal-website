@@ -7,6 +7,7 @@ Documentation    Acceptance coverage for the `ai-assisted: true` front-matter
 Resource         resources/site.resource
 Suite Setup      Open Browser To Page    /blog/marking-ai-assisted-content
 Suite Teardown   Close Browser Session
+Test Teardown    Note Netlify Challenge If The Test Failed
 
 *** Test Cases ***
 A Marked Blog Post Discloses That It Is AI Assisted

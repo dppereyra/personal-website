@@ -8,6 +8,7 @@ Documentation    Acceptance coverage for blog post body typography. Post bodies
 Resource         resources/site.resource
 Suite Setup      Open Browser To Page    /blog/marking-ai-assisted-content
 Suite Teardown   Close Browser Session
+Test Teardown    Note Netlify Challenge If The Test Failed
 
 *** Test Cases ***
 Post Headings Stand Out From Body Text

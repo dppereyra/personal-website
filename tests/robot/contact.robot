@@ -7,6 +7,7 @@ Documentation    Acceptance coverage for the Contact page. It offers no form —
 Resource         resources/site.resource
 Suite Setup      Open Browser To Page    /contact
 Suite Teardown   Close Browser Session
+Test Teardown    Note Netlify Challenge If The Test Failed
 
 *** Variables ***
 ${EMAIL_ME_LINK}    xpath://main//a[normalize-space()='Email Me']

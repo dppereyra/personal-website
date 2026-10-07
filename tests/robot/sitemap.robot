@@ -8,6 +8,7 @@ Documentation    Acceptance coverage for the generated XML sitemap. Only the rea
 ...              decided by ${BASE_URL}. Like security-headers.robot, these fetch
 ...              ${BASE_URL} directly rather than through the browser.
 Resource         resources/site.resource
+Test Teardown    Note Netlify Challenge If The Test Failed
 
 *** Test Cases ***
 The Production Site Publishes A Sitemap Of Its Pages

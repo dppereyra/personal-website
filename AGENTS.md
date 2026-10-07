@@ -393,12 +393,14 @@ Staging and production are served by one Netlify project, `www-dppereyra-product
 2. Get security input before writing code that touches auth, dependencies, secrets, or anything externally exposed (new endpoints, headers, forms) — not just a post-hoc review after the fact
 3. Write the implementation
 4. Push to `dev` (or merge a short-lived branch into it)
-5. Once the `dev` branch deploy is live, verify staging — both a QA pass (exercise the actual feature in a real browser, not just unit tests) and a security pass (for anything touching the areas in step 2): run the full Robot suite against it with `NEW_RELIC_ENVIRONMENT=staging`
+5. Once the `dev` branch deploy is live, verify staging — both a QA pass (exercise the actual feature in a real browser, not just unit tests) and a security pass (for anything touching the areas in step 2): `BASE_URL=<staging URL> NEW_RELIC_ENVIRONMENT=staging npm run test:robot:site`
 6. Open the release PR from `dev` → `master`
 7. Wait for its Netlify deploy preview and verify it with QA/security the same way (`NEW_RELIC_ENVIRONMENT=preview`)
 8. Merge to `master`
-9. Verify production itself — deploy-preview behaviour isn't guaranteed identical to a real deploy (response headers through Cloudflare, env-var-dependent branching): the full Robot suite against www.dppereyra.com with `NEW_RELIC_ENVIRONMENT=production`, the New Relic deploy marker for the commit, and the GitHub Release
+9. Verify production itself — deploy-preview behaviour isn't guaranteed identical to a real deploy (response headers through Cloudflare, env-var-dependent branching): `BASE_URL=https://www.dppereyra.com NEW_RELIC_ENVIRONMENT=production npm run test:robot:site`, the New Relic deploy marker for the commit, and the GitHub Release
 
 Steps 5, 7 and 9 are real verification gates, not formalities — confirm the actual behavior (build a fresh local build, curl the live headers/feeds, drive a real browser) rather than trusting a report at face value. Production only ever changes through steps 6–8, and only once staging is actually confirmed good, not just "PR opened."
+
+**Running the Robot suites against a deployed site**: `npm run test:robot:site` (tests/robot/run_deployed.py) runs every suite against `BASE_URL`. Netlify sometimes answers automated browsers on `*.netlify.app` with a "We are verifying your connection" bot challenge; every suite's `Test Teardown` (`Note Netlify Challenge If The Test Failed`) tags a failure caused by it `netlify-challenge`, and the runner reruns only those tests after a pause (`NETLIFY_CHALLENGE_WAIT`, default 60s; `NETLIFY_CHALLENGE_RETRIES`, default 2) and merges the results. Real failures, and tests still challenged after the retries, fail the run. In Chrome the suites also block Netlify's deploy-preview review toolbar, which otherwise sits over the page and intercepts clicks.
 
 **Checking deploy readiness by polling headers**: the `*.netlify.app` URLs (deploy previews, the `dev` branch deploy) are served directly by Netlify and return an `etag` header. `www.dppereyra.com` is fronted by Cloudflare in front of Netlify and does not return `etag` — a `curl` loop polling for that header on the apex domain will hang forever. Poll `cache-status`/`age` or the Netlify API's deploy `state` instead when checking the live production domain specifically.
