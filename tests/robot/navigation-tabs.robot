@@ -9,6 +9,7 @@ Suite Setup      Open Browser To Page    /
 Suite Teardown   Close Browser Session
 Test Setup       Given A Visitor Is On The Home Page
 Test Template    Navigating To A Primary Nav Tab Should Load Its Page
+Test Teardown    Note Netlify Challenge If The Test Failed
 
 *** Test Cases ***             LABEL      EXPECTED PATH    EXPECTED HEADING
 Home Tab Loads The Home Page                Home       /                Home

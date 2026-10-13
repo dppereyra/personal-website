@@ -15,6 +15,7 @@ Documentation    Acceptance coverage for the baseline HTTP security response
 Resource         resources/site.resource
 Test Tags        deployed-only
 Test Template    Response For A Requested Path Should Include Baseline Security Headers
+Test Teardown    Note Netlify Challenge If The Test Failed
 
 *** Test Cases ***                                          PATH             DESCRIPTION
 Homepage Response Includes Baseline Security Headers          /                the homepage

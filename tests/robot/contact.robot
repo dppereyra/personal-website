@@ -7,6 +7,7 @@ Documentation    Acceptance coverage for the Contact page. It offers no form —
 Resource         resources/site.resource
 Suite Setup      Open Browser To Page    /contact
 Suite Teardown   Close Browser Session
+Test Teardown    Note Netlify Challenge If The Test Failed
 
 *** Variables ***
 ${EMAIL_ME_LINK}    xpath://main//a[normalize-space()='Email Me']
@@ -41,3 +42,22 @@ Email Me Is The Primary Action, Ahead Of Booking A Meeting
   ...    Email Me should come before Schedule a Meeting on the page
   ${class}=    Get Element Attribute    ${EMAIL_ME_LINK}    class
   Should Contain    ${class}    btn-primary
+
+The Page Does Not Repeat Its Options In A Closing Banner
+  [Documentation]    The two cards already offer Email Me and Schedule a Meeting;
+  ...    a banner restating them below is redundant.
+  Given A Visitor Opens The Contact Page
+  ${banners}=    Get Element Count    css:main .alert
+  Should Be Equal As Integers    ${banners}    0
+  ...    The Contact page still shows ${banners} alert banner(s)
+
+Get In Touch Sits Above Other Ways To Connect
+  [Documentation]    The two cards stack vertically even on a wide screen, with
+  ...    Get in Touch first, rather than sitting side by side.
+  Restore Desktop Viewport
+  Given A Visitor Opens The Contact Page
+  ${layout}=    Execute Javascript
+  ...    const cards=[...document.querySelectorAll('main .card')]; const at=t=>cards.find(c=>c.querySelector('h2')?.textContent.trim()===t)?.getBoundingClientRect(); const a=at('Get in Touch'), b=at('Other Ways to Connect'); return {found: !!(a && b), stacked: !!(a && b && b.top >= a.bottom), left_aligned: !!(a && b && Math.abs(a.left - b.left) < 2)};
+  Should Be True    ${layout}[found]    Could not find both contact cards
+  Should Be True    ${layout}[stacked]    Other Ways to Connect is not below Get in Touch
+  Should Be True    ${layout}[left_aligned]    The contact cards are not stacked in one column

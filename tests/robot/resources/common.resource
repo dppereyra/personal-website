@@ -2,6 +2,7 @@
 Library    Collections
 Library    SeleniumLibrary    timeout=10 seconds    run_on_failure=Capture Page Screenshot
 Library    String
+Library    NetlifyChallenge.py
 
 *** Variables ***
 ${BASE_URL}             %{BASE_URL=http://127.0.0.1:4321}
@@ -44,6 +45,23 @@ Block Netlify Review Toolbar
   ${sl}=    Get Library Instance    SeleniumLibrary
   Call Method    ${sl.driver}    execute_cdp_cmd    Network.enable    ${{ {} }}
   Call Method    ${sl.driver}    execute_cdp_cmd    Network.setBlockedURLs    ${{ {'urls': ['*/.netlify/scripts/cdp*']} }}
+
+Note Netlify Challenge If The Test Failed
+  [Documentation]    Test Teardown for every suite. Netlify can answer automated
+  ...    traffic on *.netlify.app with a "We are verifying your connection"
+  ...    page instead of the site; a test that fails on that page found no site
+  ...    problem. Such failures are tagged netlify-challenge and say so in their
+  ...    message, and tests/robot/run_deployed.py reruns exactly those tests.
+  IF    $TEST_STATUS != 'FAIL'    RETURN
+  ${challenged}=    Evaluate    'Netlify bot challenge' in $TEST_MESSAGE
+  IF    not ${challenged}
+    ${status}    ${source}=    Run Keyword And Ignore Error    Get Source
+    ${challenged}=    Evaluate    $status == 'PASS' and 'We are verifying your connection' in $source
+  END
+  IF    ${challenged}
+    Set Tags    netlify-challenge
+    Set Test Message    [Netlify bot challenge, not a site failure] ${TEST_MESSAGE}
+  END
 
 Close Browser Session
   Close All Browsers

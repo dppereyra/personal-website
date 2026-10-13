@@ -8,6 +8,7 @@ Resource         resources/site.resource
 Suite Setup      Open Browser To Page    /
 Suite Teardown   Close Browser Session
 Test Setup       Given A Visitor Is On The Home Page
+Test Teardown    Note Netlify Challenge If The Test Failed
 
 *** Test Cases ***
 Primary Navigation Lists All Six Tabs In The Expected Order

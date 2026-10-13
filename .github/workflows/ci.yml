@@ -102,6 +102,9 @@ jobs:
       - name: Install Robot dependencies
         run: pip install -r requirements-robot.txt
 
+      - name: Run Robot runner unit tests
+        run: python -m unittest discover -s tests/robot -p 'test_*.py'
+
       - name: Setup Chrome
         uses: browser-actions/setup-chrome@v2
 

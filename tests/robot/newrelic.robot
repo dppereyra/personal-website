@@ -11,6 +11,7 @@ Documentation    Acceptance coverage for the New Relic Browser agent. A build on
 Resource         resources/site.resource
 Suite Setup      Open Browser To Page    /
 Suite Teardown   Close Browser Session
+Test Teardown    Note Netlify Challenge If The Test Failed
 
 *** Variables ***
 ${NEW_RELIC_ENVIRONMENT}    %{NEW_RELIC_ENVIRONMENT=}
