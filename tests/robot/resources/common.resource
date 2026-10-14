@@ -95,15 +95,16 @@ Collect Internal Links From Current Page
   RETURN    ${internal_paths}
 
 Assert Current Page Is Not 404
-  ${status_markers}=    Create List    404    page not found
+  [Documentation]    Checks what a visitor sees — the title and the visible text —
+  ...    not the raw source, where build hashes such as Sentry debug IDs can
+  ...    contain "404" by chance.
   ${title}=    Get Title
-  ${source}=    Get Source
   ${title_lower}=    Convert To Lower Case    ${title}
-  ${source_lower}=    Convert To Lower Case    ${source}
-  FOR    ${marker}    IN    @{status_markers}
-    Should Not Contain    ${title_lower}    ${marker}
-    Should Not Contain    ${source_lower}    ${marker}
-  END
+  Should Not Contain    ${title_lower}    404
+  Should Not Contain    ${title_lower}    page not found
+  ${text}=    Get Text    css:body
+  ${text_lower}=    Convert To Lower Case    ${text}
+  Should Not Contain    ${text_lower}    page not found
 
 Assert PDF Destination Is Not 404
   ${title}=    Get Title

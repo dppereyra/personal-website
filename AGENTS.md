@@ -388,6 +388,8 @@ Staging and production are served by one Netlify project, `www-dppereyra-product
 | Pull request deploy previews | deploy-preview | Disallow / noindex / none | `preview` |
 | Local and CI builds | none | Disallow / noindex / none | no agent |
 
+**Uptime**: New Relic Synthetics runs a ping monitor every 5 minutes, from US East, US West and EU West, against production (`www.dppereyra.com (production)`) and staging (`dev branch deploy (staging)`), tagged `environment` and `app: personal-website`. Ping checks don't count against the free tier's synthetics quota. When the staging URL changes, update that monitor's URI.
+
 **Full development loop** (the whole sequence, not just the branch flow):
 1. Write tests first, before the implementation they cover
 2. Get security input before writing code that touches auth, dependencies, secrets, or anything externally exposed (new endpoints, headers, forms) — not just a post-hoc review after the fact
