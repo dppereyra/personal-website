@@ -97,14 +97,18 @@ Collect Internal Links From Current Page
 Assert Current Page Is Not 404
   [Documentation]    Checks what a visitor sees — the title and the visible text —
   ...    not the raw source, where build hashes such as Sentry debug IDs can
-  ...    contain "404" by chance.
+  ...    contain "404" by chance. XML feeds have no body, so only the title is
+  ...    checked there; a missing feed still serves the HTML 404 page.
   ${title}=    Get Title
   ${title_lower}=    Convert To Lower Case    ${title}
   Should Not Contain    ${title_lower}    404
   Should Not Contain    ${title_lower}    page not found
-  ${text}=    Get Text    css:body
-  ${text_lower}=    Convert To Lower Case    ${text}
-  Should Not Contain    ${text_lower}    page not found
+  ${body_count}=    Get Element Count    css:body
+  IF    ${body_count} > 0
+    ${text}=    Get Text    css:body
+    ${text_lower}=    Convert To Lower Case    ${text}
+    Should Not Contain    ${text_lower}    page not found
+  END
 
 Assert PDF Destination Is Not 404
   ${title}=    Get Title
