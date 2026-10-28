@@ -371,10 +371,10 @@ All PRs must pass:
 
 Configured for Netlify deployment via netlify-cli. The site is configured for www.dppereyra.com domain.
 
-Staging and production are served by one Netlify project, `www-dppereyra-production` (to be renamed `dppereyra-website`).
+Staging and production are served by one Netlify project, `dppereyra-website` (renamed from `www-dppereyra-production` on 2026-10-29).
 
 **Branch Roles**:
-- `dev` - the integration branch and **staging**: each merge deploys the Netlify branch deploy at `https://dev--www-dppereyra-production.netlify.app`. Protected: changes arrive only through pull requests from short-lived branches, so staging rebuilds once per merged change rather than on every commit
+- `dev` - the integration branch and **staging**: each merge deploys the Netlify branch deploy at `https://dev--dppereyra-website.netlify.app`. Protected: changes arrive only through pull requests from short-lived branches, so staging rebuilds once per merged change rather than on every commit
 - `master` - **production**, deployed to www.dppereyra.com. Protected: changes arrive only through a pull request from `dev`
 
 **Release flow**: work happens on a short-lived branch, reaches `dev` through a pull request (whose deploy preview is checked first), is verified on staging, and is released by a pull request from `dev` → `master`. Merging that PR is the promotion: Netlify deploys `master` to production, the `newrelic-deploy-marker` build plugin records the deploy in New Relic, and `release.yml` creates the dated GitHub Release.
